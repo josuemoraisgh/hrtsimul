@@ -84,8 +84,8 @@ class CustomTable extends StatelessWidget {
           .splitByLength(2)
           .map((e) => hrtTypeHexTo(e, 'UInt').toString())
           .join()),
+      (String s) when s.contains('BIT_ENUM') => _hrtTypeHex2BitEnum(value),          
       (String s) when s.contains('ENUM') => _hrtTypeHex2Enun(value),
-      (String s) when s.contains('BIT_ENUM') => _hrtTypeHex2BitEnum(value),
       'PACKED_ASCII' => tableCell(value.$3
           .splitByLength(6)
           .map((e) => hrtTypeHexTo(e, 'PAscii').toString())

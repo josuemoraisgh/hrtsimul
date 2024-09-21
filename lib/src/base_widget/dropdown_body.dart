@@ -19,17 +19,19 @@ class _DropdownBodyState extends State<DropdownBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return Center(
       child: DropdownButton<String>(
         value: findValueFromMap(widget.hrtEnum!, id),
         onChanged: (String? novoItemSelecionado) {
           if (novoItemSelecionado != null) {
-            widget.hrtEnum!.entries
-                .firstWhere(
-                  (entry) => entry.value == novoItemSelecionado,
-                  orElse: () => const MapEntry('', ''),
-                )
-                .key;
+            setState(() {
+              id = widget.hrtEnum!.entries
+                  .firstWhere(
+                    (entry) => entry.value == novoItemSelecionado,
+                    orElse: () => const MapEntry('', ''),
+                  )
+                  .key;
+            });
           }
         },
         style: const TextStyle(
@@ -41,15 +43,24 @@ class _DropdownBodyState extends State<DropdownBody> {
         focusColor: Theme.of(context).colorScheme.surface,
         selectedItemBuilder: (BuildContext context) {
           return widget.hrtEnum!.entries
-              .map((MapEntry<String, String> entry) {
-                return Text(
-                  entry.value,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
-                );
-              })
+                .map<DropdownMenuItem<String>>(
+                  (MapEntry<String, String> entry) {
+                    return DropdownMenuItem<String>(
+                      value: entry.value,
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 200), // Limita a largura
+                        child: Text(
+                          entry.value,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
               .toList()
               .cast<Widget>();
         },
@@ -59,6 +70,7 @@ class _DropdownBodyState extends State<DropdownBody> {
                 value: entry.value,
                 child: Text(
                   entry.value,
+                  // overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -73,7 +85,6 @@ class _DropdownBodyState extends State<DropdownBody> {
   }
 
   String? findValueFromMap(Map<String, String> map, String keyValue) {
-    int keyToTest = int.parse(keyValue, radix: 16);
     // Função auxiliar para verificar se a chave está no intervalo (ex.: '25 - FF')
     bool isInRange(String range, int key) {
       if (range.contains('-')) {
@@ -87,9 +98,10 @@ class _DropdownBodyState extends State<DropdownBody> {
     }
 
     // Procurando a chave correspondente ao valor
+    int keyToTest = keyValue.contains('-') ? 0 : int.parse(keyValue, radix: 16);    
     String? result;
     map.forEach((k, v) {
-      if (k == keyToTest.toRadixString(16).toUpperCase()) {
+      if (k == keyValue.toUpperCase()) {
         result = v; // Chave exata encontrada
       } else if (isInRange(k, keyToTest)) {
         result = v; // Chave encontrada dentro de um intervalo
