@@ -2,7 +2,7 @@ const Map<int, Map<String, String>> hrtEnum = {
   //Command-Specific Response Codes
   0: {
     '00': 'No Command-Specific Errors',
-    '01': 'Undefined',
+    '01': 'Undefined1',
     '02': 'Invalid Selection (Poll Address)',
     '03': 'Passed Parameter Too Large',
     '04': 'Passed Parameter Too Small',
@@ -22,21 +22,21 @@ const Map<int, Map<String, String>> hrtEnum = {
         'Upper and Lower Range Values Out Of Limits |  Computation Error, Trim Values Were Not Changed',
     '0E':
         'Span Too Small (Device Accuracy May Be Impaired) | New Lower Range Value Pushed',
-    '0F': 'Undefined',
+    '0F': 'Undefined2',
     '10': 'Access Restricted',
     '11':
         'Invalid Device Variable Index. The Device Variable does not exist in this Field Device.',
     '12': 'Invalid Units Code',
     '13': 'Device Variable index not allowed for this command.',
-    '14 - 1C': 'Undefined',
+    '14 - 1C': 'Undefined3',
     '1D': 'Invalid Span',
-    '1E - 1F': 'Undefined',
+    '1E - 1F': 'Undefined4',
     '20': 'Busy | A DR Could Not Be Started',
     '21': 'DR Initiated',
     '22': 'DR Running',
     '23': 'DR Dead',
     '24': 'DR Conflict',
-    '25 - FF': 'Undefined'
+    '25-FF': 'Undefined5'
   },
   //Device Type Codes
   1: {
@@ -555,21 +555,21 @@ const Map<int, Map<String, String>> hrtEnum = {
   },
   //Response Code
   27: {
-    '01-07': 'Error - Single',
-    '08': 'Warning - Multiple',
-    '09-0D': 'Error - Multiple',
-    '0E': 'Warning - Multiple',
-    '0F': 'Error - Multiple',
-    '10-17': 'Error - Single',
-    '18-1B': 'Warning - Single',
-    '1C': 'Error - Multiple',
-    '1D': 'Error - Multiple',
-    '1E': 'Warning - Multiple',
-    '1F': 'Warning - Multiple',
-    '20-40': 'Error - Single',
-    '41-5F': 'Error - Multiple',
-    '60-6F': 'Warning - Single',
-    '70-7F': 'Warning - Multiple',
+    '01-07': 'Error - Single1',
+    '08': 'Warning - Multiple1',
+    '09-0D': 'Error - Multiple1',
+    '0E': 'Warning - Multiple2',
+    '0F': 'Error - Multiple2',
+    '10-17': 'Error - Single2',
+    '18-1B': 'Warning - Single1',
+    '1C': 'Error - Multiple3',
+    '1D': 'Error - Multiple4',
+    '1E': 'Warning - Multiple3',
+    '1F': 'Warning - Multiple4',
+    '20-40': 'Error - Single3',
+    '41-5F': 'Error - Multiple5',
+    '60-6F': 'Warning - Single2',
+    '70-7F': 'Warning - Multiple5',
   },
   //EEPROM Control Code
   28: {

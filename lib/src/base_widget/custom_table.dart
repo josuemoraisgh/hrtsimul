@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:hrtsimul/src/base_widget/dropdown_body.dart';
 import '../extension/hex_extension_string.dart';
+import '../models/hrt_enum.dart';
 import '../models/hrt_type.dart';
 
 class CustomTable extends StatelessWidget {
@@ -78,10 +80,16 @@ class CustomTable extends StatelessWidget {
 
   Widget hrtType((int, String, String) value) {
     final Widget result = switch (value.$2) {
-      'UNSIGNED' => tableCell(value.$3.splitByLength(2).map((e) => hrtTypeHexTo(e, 'UInt').toString()).join()),
+      'UNSIGNED' => tableCell(value.$3
+          .splitByLength(2)
+          .map((e) => hrtTypeHexTo(e, 'UInt').toString())
+          .join()),
       (String s) when s.contains('ENUM') => _hrtTypeHex2Enun(value),
       (String s) when s.contains('BIT_ENUM') => _hrtTypeHex2BitEnum(value),
-      'PACKED_ASCII' => tableCell(value.$3.splitByLength(6).map((e) => hrtTypeHexTo(e, 'PAscii').toString()).join()),
+      'PACKED_ASCII' => tableCell(value.$3
+          .splitByLength(6)
+          .map((e) => hrtTypeHexTo(e, 'PAscii').toString())
+          .join()),
       'DATE' => tableCell(hrtTypeHexTo(value.$3, 'Date').toString()),
       'TIME' => tableCell(hrtTypeHexTo(value.$3, 'Time').toString()),
       'FLOAT' => _hrtTypeHex2Float(value),
@@ -90,8 +98,10 @@ class CustomTable extends StatelessWidget {
     return result;
   }
 
-  Widget _hrtTypeHex2Enun(value) {
-    return Container();
+  Widget _hrtTypeHex2Enun((int, String, String) value) {
+    return DropdownBody(
+        id: value.$3.substring(value.$3.length - 2),
+        hrtEnum: hrtEnum[int.parse(value.$2.substring(value.$2.length - 2))]);
   }
 
   Widget _hrtTypeHex2BitEnum(value) {
