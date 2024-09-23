@@ -24,14 +24,16 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<bool>(
-        future: controller.init(),
-        initialData: false,
-        builder: (BuildContext context, AsyncSnapshot snapshot) => snapshot.data == false
-            ? const Center(child: CircularProgressIndicator())
-            : LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  return Container(
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return FutureBuilder<bool>(
+            future: controller.init(),
+            initialData: false,
+            builder: (BuildContext context, AsyncSnapshot snapshot) => snapshot
+                        .data ==
+                    false
+                ? const Center(child: CircularProgressIndicator())
+                : Container(
                     padding: const EdgeInsets.only(
                         left: 10, top: 10, right: 10, bottom: 10),
                     width: constraints.maxWidth,
@@ -225,9 +227,9 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+          );
+        },
       ),
     );
   }

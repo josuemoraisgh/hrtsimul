@@ -20,7 +20,7 @@ class HomeController extends Disposable {
 
   HomeController(this.hrtComm);
 
-  Future<bool> init() async{
+  Future<bool> init() async {
     await hrtStorage.init();
     return true;
   }
@@ -28,9 +28,11 @@ class HomeController extends Disposable {
   void readHrtFrame(String data) {
     final hrtResponse = HrtFrame(data);
     final aux = hrtResponse.frame.splitByLength(2).join(" ");
-    textController.text += masterSlave == '00' ? "\n$aux - " : aux;
-    if (kDebugMode) {
-      print(aux);
+    if (masterSlave == '00') {
+      textController.text += "\n$aux -> ";
+      slaveMode(data);
+    } else {
+      textController.text += aux;
     }
   }
 
@@ -45,7 +47,7 @@ class HomeController extends Disposable {
       final hrtRequest = HrtBuild(hrtStorage, hrtFrameRead);
       final valueAux = hrtRequest.frame;
       hrtComm.writeFrame(valueAux);
-      final aux = '${valueAux.splitByLength(2).join(" ")} -> ';
+      final aux = '\n${valueAux.splitByLength(2).join(" ")} -> ';
       textController.text += aux;
       if (kDebugMode) {
         print(aux);
@@ -60,14 +62,9 @@ class HomeController extends Disposable {
         'master_address', masterSlave); //quando Slave deve ser 0
     hrtStorage.setVariable('frame_type', "06"); //Do device para o master
     final hrtFrameRead = HrtFrame(frameRead);
-    if (hrtFrameRead.log.isEmpty) {
-      final hrtResponse = HrtBuild(hrtStorage, hrtFrameRead);
-      textController.text +=
-          '${hrtFrameRead.frame.splitByLength(2).join(" ")} -> ${hrtResponse.frame.splitByLength(2).join(" ")}\n';
-      hrtComm.writeFrame(hrtResponse.frame);
-      return true;
-    }
-    return false;
+    final hrtResponse = HrtBuild(hrtStorage, hrtFrameRead);
+    textController.text += hrtResponse.frame.splitByLength(2).join(" ");
+    return hrtComm.writeFrame(hrtResponse.frame);
   }
 
   @override

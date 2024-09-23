@@ -42,21 +42,18 @@ class _CustomTableState extends State<CustomTable> {
           ),
           Expanded(
             child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Table(
-                      border: TableBorder.all(),
-                      columnWidths: const {
-                        0: FixedColumnWidth(300),
-                      },
-                      children: [
-                        for (var name in controller.hrtStorage.keys())
-                          tableLinha(name),
-                      ],
-                    );
-                  },
-                )),
+              scrollDirection: Axis.vertical,
+              child: Table(
+                border: TableBorder.all(),
+                columnWidths: const {
+                  0: FixedColumnWidth(300),
+                },
+                children: [
+                  for (var name in controller.hrtStorage.keys())
+                    tableLinha(name),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -81,7 +78,8 @@ class _CustomTableState extends State<CustomTable> {
     return TableRow(
       children: [
         tableCell(name),
-        hrtType(hrtSettings[name]!.$2, controller.hrtStorage.getVariable(name) ?? "NULL"),
+        hrtType(hrtSettings[name]!.$2,
+            controller.hrtStorage.getVariable(name) ?? "NULL"),
       ],
     );
   }
@@ -102,7 +100,8 @@ class _CustomTableState extends State<CustomTable> {
           .join()),
       'DATE' => tableCell(hrtTypeHexTo(value, 'Date').toString()),
       'TIME' => tableCell(hrtTypeHexTo(value, 'Time').toString()),
-      'FLOAT' => tableCell(controller.hrtStorage.hrtFunc2Double(value).toString()),
+      'FLOAT' =>
+        tableCell(controller.hrtStorage.hrtFunc2Double(value).toString()),
       _ => Container(),
     };
     return result;
