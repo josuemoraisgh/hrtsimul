@@ -164,8 +164,8 @@ class HrtFrame {
       //Extrai o manufacter_id
       _pollingAddress = "";
       manufacterId = valueAux.getBits(0, 6).toRadixString(16).padLeft(2, '0');
-      deviceType = newAddress.substring(posIniFrame + 2, posIniFrame + 4);
-      deviceId = newAddress.substring(posIniFrame + 4, posIniFrame + 10);
+      deviceType = newAddress.substring(2, 4);
+      deviceId = newAddress.substring(4, 10);
     }
   }
 

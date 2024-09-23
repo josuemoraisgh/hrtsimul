@@ -158,11 +158,11 @@ class _HomePageState extends State<HomePage> {
                                 child: RadioListTile<String>(
                                   contentPadding: const EdgeInsets.all(0),
                                   title: const Text('Master'),
-                                  value: '01',
-                                  groupValue: controller.masterSlave,
+                                  value: '02',
+                                  groupValue: controller.frameType,
                                   onChanged: (String? value) {
                                     setState(() {
-                                      controller.masterSlave = value!;
+                                      controller.frameType = value!;
                                     });
                                   },
                                 ),
@@ -173,11 +173,11 @@ class _HomePageState extends State<HomePage> {
                                   contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 0.0),
                                   title: const Text('Slave'),
-                                  value: '00',
-                                  groupValue: controller.masterSlave,
+                                  value: '06',
+                                  groupValue: controller.frameType,
                                   onChanged: (String? value) {
                                     setState(() {
-                                      controller.masterSlave = value!;
+                                      controller.frameType = value!;
                                     });
                                   },
                                 ),

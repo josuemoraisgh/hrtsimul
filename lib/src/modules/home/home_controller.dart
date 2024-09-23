@@ -12,7 +12,7 @@ class HomeController extends Disposable {
   late final HrtComm hrtComm;
   final connectNotifier = ValueNotifier<String>("");
   final sendNotifier = ValueNotifier<String>("");
-  String masterSlave = "01";
+  String frameType = "06";
   final hrtFrameWrite = HrtFrame();
   final hrtStorage = HrtStorage();
   final textController = TextEditingController();
@@ -28,7 +28,7 @@ class HomeController extends Disposable {
   void readHrtFrame(String data) {
     final hrtResponse = HrtFrame(data);
     final aux = hrtResponse.frame.splitByLength(2).join(" ");
-    if (masterSlave == '00') {
+    if (frameType == '06') {
       textController.text += "\n$aux -> ";
       slaveMode(data);
     } else {
@@ -37,10 +37,8 @@ class HomeController extends Disposable {
   }
 
   bool masterMode(String commandWrite) {
-    hrtStorage.setVariable(
-        'master_address', masterSlave); //Seta para primario master
-    hrtStorage.setVariable('frame_type',
-        masterSlave == '01' ? "02" : "06"); //Do master para o device
+    hrtStorage.setVariable('master_address', '80'); //Do device para o master      
+    hrtStorage.setVariable('frame_type', frameType ); //Do master para o device
     final hrtFrameRead = HrtFrame()
       ..command = commandWrite == "" ? "00" : commandWrite;
     if (hrtFrameRead.log.isEmpty) {
@@ -57,10 +55,9 @@ class HomeController extends Disposable {
     return false;
   }
 
-  Future<bool> slaveMode(String frameRead) async {
-    hrtStorage.setVariable(
-        'master_address', masterSlave); //quando Slave deve ser 0
-    hrtStorage.setVariable('frame_type', "06"); //Do device para o master
+  Future<bool> slaveMode(String frameRead) async {//quando Slave deve ser 0
+    hrtStorage.setVariable('master_address', '80'); //Do device para o master    
+    hrtStorage.setVariable('frame_type', frameType); //Do device para o master  
     final hrtFrameRead = HrtFrame(frameRead);
     final hrtResponse = HrtBuild(hrtStorage, hrtFrameRead);
     textController.text += hrtResponse.frame.splitByLength(2).join(" ");
