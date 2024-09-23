@@ -17,16 +17,18 @@ class HomeController extends Disposable {
   final hrtStorage = HrtStorage();
   final textController = TextEditingController();
   final commandController = TextEditingController();
-  final completer = Completer<bool>();
 
-  HomeController(this.hrtComm) {
-    completer.complete(hrtStorage.init());
+  HomeController(this.hrtComm);
+
+  Future<bool> init() async{
+    await hrtStorage.init();
+    return true;
   }
 
   void readHrtFrame(String data) {
     final hrtResponse = HrtFrame(data);
     final aux = hrtResponse.frame.splitByLength(2).join(" ");
-    textController.text += aux;
+    textController.text += masterSlave == '00' ? "\n$aux - " : aux;
     if (kDebugMode) {
       print(aux);
     }

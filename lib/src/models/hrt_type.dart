@@ -5,12 +5,12 @@ import 'dart:math';
 
 dynamic hrtTypeHexTo(String valor, String type) {
   final result = switch (type) {
-    'UInt' => _hrtTypeHex2UInt(valor),
-    'SReal' => _hrtTypeHex2SReal(valor),
-    'Date' => _hrtTypeHex2Date(valor),
-    'Int' => _hrtTypeHex2Int(valor),
-    'PAscii' => _hrtTypeHex2PAscii(valor),
-    'Time' => _hrtTypeHex2Time(valor),
+    'UInt' || 'UNSIGNED' => _hrtTypeHex2UInt(valor),
+    'SReal' || 'FLOAT' => _hrtTypeHex2SReal(valor),
+    'Date' || 'DATE' => _hrtTypeHex2Date(valor),
+    'Int' || 'INT' => _hrtTypeHex2Int(valor),
+    'PAscii' || 'PACKED_ASCII' => _hrtTypeHex2PAscii(valor),
+    'Time' || 'TIME' => _hrtTypeHex2Time(valor),
     _ => 'Type Invalida', //Valor padrão, substitui o default
   };
   return result;
@@ -18,12 +18,12 @@ dynamic hrtTypeHexTo(String valor, String type) {
 
 String hrtTypeHexFrom(dynamic valor, String type) {
   final result = switch (type) {
-    'UInt' => _hrtTypeUInt2Hex(valor),
-    'SReal' => _hrtTypeSReal2Hex(valor),
-    'Date' => _hrtTypeDate2Hex(valor),
-    'Int' => _hrtTypeInt2Hex(valor),
-    'PAscii' => _hrtTypePAscii2Hex(valor),
-    'Time' => _hrtTypeTime2Hex(valor),
+    'UInt' || 'UNSIGNED' => _hrtTypeUInt2Hex(valor),
+    'SReal' || 'FLOAT' => _hrtTypeSReal2Hex(valor),
+    'Date' || 'DATE' => _hrtTypeDate2Hex(valor),
+    'Int' || 'INT' => _hrtTypeInt2Hex(valor),
+    'PAscii' || 'PACKED_ASCII' => _hrtTypePAscii2Hex(valor),
+    'Time' || 'TIME' => _hrtTypeTime2Hex(valor),
     _ => 'Type inválido', //Valor padrão, substitui o default
   };
   return result;

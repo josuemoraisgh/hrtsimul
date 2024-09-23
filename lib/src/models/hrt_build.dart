@@ -1,5 +1,6 @@
 import '../models/hrt_frame.dart';
 import '../models/hrt_storage.dart';
+import '../extension/hex_extension_string.dart';
 
 class HrtBuild {
   final _hrtFrameWrite = HrtFrame();
@@ -8,15 +9,15 @@ class HrtBuild {
     _hrtFrameWrite.command = hrtFrameRead.command;
     _hrtFrameWrite.addressType =
         hrtStorage.getVariable('address_type') == "00" ? false : true;
-    _hrtFrameWrite.frameType = hrtStorage.getVariable('frame_type');
+    _hrtFrameWrite.frameType = hrtStorage.getVariable('frame_type')!;
     _hrtFrameWrite.masterAddress =
         hrtStorage.getVariable('master_address') == "00" ? false : true;
     if (_hrtFrameWrite.addressType) {
-      _hrtFrameWrite.manufacterId = hrtStorage.getVariable('manufacter_id');
-      _hrtFrameWrite.deviceType = hrtStorage.getVariable('device_type');
-      _hrtFrameWrite.deviceId = hrtStorage.getVariable('device_id');
+      _hrtFrameWrite.manufacterId = hrtStorage.getVariable('manufacter_id')!;
+      _hrtFrameWrite.deviceType = hrtStorage.getVariable('device_type')!;
+      _hrtFrameWrite.deviceId = hrtStorage.getVariable('device_id')!;
     } else {
-      _hrtFrameWrite.pollingAddress = hrtStorage.getVariable('polling_address');
+      _hrtFrameWrite.pollingAddress = hrtStorage.getVariable('polling_address')!;
     }
     if (_hrtFrameWrite.frameType == "02") {
       _request(hrtStorage, hrtFrameRead);
@@ -55,7 +56,7 @@ class HrtBuild {
         _hrtFrameWrite.body = "";
         break;
       case '11': //Read Unique Identifier Associated With Tag
-        _hrtFrameWrite.body = hrtStorage.getVariable('tag');
+        _hrtFrameWrite.body = hrtStorage.getVariable('tag')!;
         break;
       case '0C': //Read Message (12)
         _hrtFrameWrite.body = "";
@@ -73,15 +74,15 @@ class HrtBuild {
       case '00': //Identity Command
         _hrtFrameWrite.body = "00" //error_code
             "FE"
-            "${hrtStorage.getVariable('master_address', 'manufacturer_id')}"
-            "${hrtStorage.getVariable('device_type')}"
-            "${hrtStorage.getVariable('request_preambles')}"
-            "${hrtStorage.getVariable('hart_revision')}"
-            "${hrtStorage.getVariable('software_revision')}"
-            "${hrtStorage.getVariable('transmitter_revision')}"
-            "${hrtStorage.getVariable('hardware_revision')}"
-            "${hrtStorage.getVariable('device_flags')}"
-            "${hrtStorage.getVariable('device_id')}";
+            "${hrtStorage.getVariable('master_address')! & hrtStorage.getVariable('manufacturer_id')!}"
+            "${hrtStorage.getVariable('device_type')!}"
+            "${hrtStorage.getVariable('request_preambles')!}"
+            "${hrtStorage.getVariable('hart_revision')!}"
+            "${hrtStorage.getVariable('software_revision')!}"
+            "${hrtStorage.getVariable('transmitter_revision')!}"
+            "${hrtStorage.getVariable('hardware_revision')!}"
+            "${hrtStorage.getVariable('device_flags')!}"
+            "${hrtStorage.getVariable('device_id')!}";
         break;
       case '01': //Read Primary Variable
         _hrtFrameWrite.body = "00" //error_code
@@ -133,7 +134,7 @@ class HrtBuild {
         _hrtFrameWrite.body =
             "${(hrtFrameRead.body == hrtStorage.getVariable('tag')) ? '00' : '01'}" //error_code 00 - ok | 01 - undefined
             "FE"
-            "${hrtStorage.getVariable('master_slave', 'manufacturer_id')}"
+            "${hrtStorage.getVariable('master_slave')! & hrtStorage.getVariable('manufacturer_id')!}"
             "${hrtStorage.getVariable('device_type')}"
             "${hrtStorage.getVariable('request_preambles')}"
             "${hrtStorage.getVariable('hart_revision')}"

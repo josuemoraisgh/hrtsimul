@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hrtsimul/src/models/hrt_type.dart';
-import 'package:hrtsimul/src/models/hrt_type.dart';
 
 void main() {
   test('Deve dar erro quando valor em int for maior 65535', () {
