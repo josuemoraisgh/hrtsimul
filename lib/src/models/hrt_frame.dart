@@ -13,7 +13,8 @@ class HrtFrame {
   String preamble = "FFFFFFFFFF";
   bool addressType = false;
   String frameType = "02";
-  bool masterAddress = true; // 1 - primary master; 0 - secondary master -> Pra quem ele esta mandando
+  bool masterAddress =
+      true; // 1 - primary master; 0 - secondary master -> Pra quem ele esta mandando
   bool burstMode = false; // 1 - in Burst Mode; 0 - not Burst Mode or Slave
   String _manufacterId = "00";
   String _deviceType = "00";
@@ -133,14 +134,16 @@ class HrtFrame {
       .setBits(7, 1, addressType == true ? 1 : 0) // addressType
       .setBits(0, 3, int.parse(frameType, radix: 16)) //frameType
       .toRadixString(16)
-      .padLeft(2, '0');
+      .padLeft(2, '0')
+      .toUpperCase();
 
   set delimiter(String newDelimiter) {
     final valueAux = int.parse(newDelimiter, radix: 16);
     //Extrai o address type
     addressType = valueAux.getBits(7, 1) == 1 ? true : false;
     //Extrai o frame type
-    frameType = valueAux.getBits(0, 3).toRadixString(16).padLeft(2, '0');
+    frameType =
+        valueAux.getBits(0, 3).toRadixString(16).padLeft(2, '0').toUpperCase();
   }
 
   //Alterando o adress tem que alterar: _masterAddress, _burstMode, _pollingAddress, manufacterId, deviceType, deviceId
@@ -155,15 +158,22 @@ class HrtFrame {
     burstMode = valueAux.getBits(6, 1) == 1 ? true : false;
     if (addressType == false) {
       //Extrai o polling_address
-      _pollingAddress =
-          valueAux.getBits(0, 6).toRadixString(16).padLeft(2, '0');
+      _pollingAddress = valueAux
+          .getBits(0, 6)
+          .toRadixString(16)
+          .padLeft(2, '0')
+          .toUpperCase();
       manufacterId = "";
       deviceType = "";
       deviceId = "";
     } else {
       //Extrai o manufacter_id
       _pollingAddress = "";
-      manufacterId = valueAux.getBits(0, 6).toRadixString(16).padLeft(2, '0');
+      manufacterId = valueAux
+          .getBits(0, 6)
+          .toRadixString(16)
+          .padLeft(2, '0')
+          .toUpperCase();
       deviceType = newAddress.substring(2, 4);
       deviceId = newAddress.substring(4, 10);
     }

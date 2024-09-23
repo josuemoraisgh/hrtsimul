@@ -1,5 +1,6 @@
 //NAME:(BYTE_SIZE, TYPE, DEFAULT_VALUE | @FUNCTION)
-const Map<String, (int, String, String)> hrtSettings = {
+//DEFAULT_VALUE = {TT301,LD301,FY301,DT301}
+const Map<String, (int, String, dynamic)> hrtSettings = {
   'frame_type': (1, 'UNSIGNED', '06'),
   'address_type': (1, 'UNSIGNED', '00'),
   'error_code': (2, 'ENUM00', '0040'),
@@ -8,7 +9,11 @@ const Map<String, (int, String, String)> hrtSettings = {
   'comm_status': (1, 'BIT_ENUM03', '00'),
   'master_address': (1, 'BIT_ENUM01', '80'),
   'manufacturer_id': (1, 'ENUM08', '3E'),
-  'device_type': (1, 'ENUM01', '02'),
+  'device_type': (
+    1,
+    'ENUM01',
+    {'TT301': '02', 'LD301': '07', 'FY301': '01', 'DT301': '06'}
+  ),
   'request_preambles': (1, 'UNSIGNED', '05'),
   'hart_revision': (1, 'UNSIGNED', '05'),
   'transmitter_revision': (1, 'UNSIGNED', '30'),
@@ -17,16 +22,35 @@ const Map<String, (int, String, String)> hrtSettings = {
   'device_flags': (1, 'BIT_ENUM04', '00'),
   'device_id': (3, 'UNSIGNED', '001E66'),
   'polling_address': (1, 'UNSIGNED', '80'),
-  'tag': (8, 'PACKED_ASCII', '514CF0C60820'), //TT301
+  'tag': (
+    8,
+    'PACKED_ASCII',
+    {
+      'TT301': '514CF0C60820',
+      'LD301': '304CF0C60820',
+      'FY301': '199CF0C60820',
+      'DT301': '114CF0C60820'
+    }
+  ), //TT301
   'message': (
     32,
     'PACKED_ASCII',
-    '34510910F4A010581414D405481515481820820820820820'
+    {
+      'TT301': '34510910F4A010581414D405481515481820820820820820',
+      'LD301': '34510910F4A01058104854D304F820820820820820820820',
+      'FY301': '40F4C90C93CE0443D280416058131654C060820820820820',
+      'DT301': '34510910F4A010580414E4C9101105820820820820820820',
+    }
   ), //MEDIDOR DE TEMPERATURA
   'descriptor': (
     16,
     'PACKED_ASCII',
-    '505350152054552060820820'
+    {
+      'TT301': '505350152054552060820820',
+      'LD301': '4121534C13E0820820820820',
+      'FY301': '40F4C90C93CE0443D2820820',
+      'DT301': '105393244044160820820820',
+    },
   ), //TEMPERATURA
   'date': (3, 'DATE', '130879'), //19/08/2021
   'upper_range_value': (4, 'FLOAT', '44548000'), //850
@@ -37,7 +61,7 @@ const Map<String, (int, String, String)> hrtSettings = {
     'FLOAT',
     '@100 * (PROCESS_VARIABLE - lower_range_value) / (upper_range_value - lower_range_value)'
   ),
-  'loop_current_mode':(1, 'ENUM00', '00'),
+  'loop_current_mode': (1, 'ENUM00', '00'),
   'loop_current': (4, 'FLOAT', '@(percent_of_range*0.16)+4'),
   'write_protect': (1, 'ENUM00', '00'),
   'private_label_distributor': (1, 'ENUM00', '00'),

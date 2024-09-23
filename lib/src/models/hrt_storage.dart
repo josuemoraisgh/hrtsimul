@@ -5,8 +5,9 @@ import '../models/hrt_type.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HrtStorage {
+  final instrument = 'TT301'; //,LD301,FY301,DT301}
   final evaluator = const ExpressionEvaluator();
-  Box<String>? box;
+  Box<dynamic>? box;
 
   HrtStorage() {
     init();
@@ -21,13 +22,20 @@ class HrtStorage {
     return box?.keys ?? hrtSettings.keys;
   }
 
-  String? getVariable(String idVariable1) {
-    return box?.get(idVariable1) ?? hrtSettings[idVariable1]?.$3;
+  String? getVariable(String idVariable) {
+    dynamic resp = box?.get(idVariable) ?? hrtSettings[idVariable]?.$3;
+    return resp is Map ? resp[instrument] : resp;
   }
 
   void setVariable(String idVariable, String value) {
     if (box != null) {
-      box!.put(idVariable, value);
+      dynamic resp = box?.get(idVariable) ?? hrtSettings[idVariable]?.$3;
+      if (resp is Map) {
+        resp[instrument] = value;
+      } else {
+        resp = value;
+      }
+      box!.put(idVariable, resp);
     }
   }
 
