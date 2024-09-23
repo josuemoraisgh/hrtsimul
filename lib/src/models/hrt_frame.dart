@@ -13,7 +13,7 @@ class HrtFrame {
   String preamble = "FFFFFFFFFF";
   bool addressType = false;
   String frameType = "02";
-  bool masterAddress = false; // 1 - primary master; 0 - secondary master
+  bool masterAddress = true; // 1 - primary master; 0 - secondary master -> Pra quem ele esta mandando
   bool burstMode = false; // 1 - in Burst Mode; 0 - not Burst Mode or Slave
   String _manufacterId = "00";
   String _deviceType = "00";

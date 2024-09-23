@@ -6,7 +6,7 @@ const Map<String, (int, String, String)> hrtSettings = {
   'response_code': (1, 'ENUM27', '30'),
   'device_status': (1, 'BIT_ENUM02', '20'),
   'comm_status': (1, 'BIT_ENUM03', '00'),
-  'master_address': (1, 'BIT_ENUM01', '00'),
+  'master_address': (1, 'BIT_ENUM01', '80'),
   'manufacturer_id': (1, 'ENUM08', '3E'),
   'device_type': (1, 'ENUM01', '02'),
   'request_preambles': (1, 'UNSIGNED', '05'),

@@ -72,9 +72,9 @@ class HrtBuild {
   void _response(final HrtStorage hrtStorage, final HrtFrame hrtFrameRead) {
     switch (hrtFrameRead.command) {
       case '00': //Identity Command
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "FE"
-            "${hrtStorage.getVariable('master_address')! & hrtStorage.getVariable('manufacturer_id')!}"
+            "${hrtStorage.getVariable('master_address')! | hrtStorage.getVariable('manufacturer_id')!}"
             "${hrtStorage.getVariable('device_type')!}"
             "${hrtStorage.getVariable('request_preambles')!}"
             "${hrtStorage.getVariable('hart_revision')!}"
@@ -85,17 +85,17 @@ class HrtBuild {
             "${hrtStorage.getVariable('device_id')!}";
         break;
       case '01': //Read Primary Variable
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "${hrtStorage.getVariable('unit_code')}"
             "${hrtStorage.getVariable('PROCESS_VARIABLE')}";
         break;
       case '02': //Read Loop Current And Percent Of Range
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "${hrtStorage.getVariable('loop_current')}"
             "${hrtStorage.getVariable('percent_of_range')}";
         break;
       case '03': //Read Dynamic Variables And Loop Current
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "${hrtStorage.getVariable('loop_current')}"
             "${hrtStorage.getVariable('unit_code')}"
             "${hrtStorage.getVariable('PROCESS_VARIABLE')}"
@@ -111,17 +111,17 @@ class HrtBuild {
         final loopCurrentMode = hrtFrameRead.body.substring(2);
         hrtStorage.setVariable('polling_address', pollingAddress);
         hrtStorage.setVariable('loop_current_mode', loopCurrentMode);
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "$pollingAddress"
             "$loopCurrentMode";
         break;
       case '07': //Read Loop Configuration
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "${hrtStorage.getVariable('polling_address')}"
             "${hrtStorage.getVariable('loop_current_mode')}";
         break;
       case '08': //Read Dynamic Variable Classifications
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "${hrtStorage.getVariable('primary_variable_classification')}"
             "${hrtStorage.getVariable('secondary_variable_classification')}"
             "${hrtStorage.getVariable('tertiary_variable_classification')}"
@@ -134,7 +134,7 @@ class HrtBuild {
         _hrtFrameWrite.body =
             "${(hrtFrameRead.body == hrtStorage.getVariable('tag')) ? '00' : '01'}" //error_code 00 - ok | 01 - undefined
             "FE"
-            "${hrtStorage.getVariable('master_slave')! & hrtStorage.getVariable('manufacturer_id')!}"
+            "${hrtStorage.getVariable('master_slave')! | hrtStorage.getVariable('manufacturer_id')!}"
             "${hrtStorage.getVariable('device_type')}"
             "${hrtStorage.getVariable('request_preambles')}"
             "${hrtStorage.getVariable('hart_revision')}"
@@ -145,11 +145,11 @@ class HrtBuild {
             "${hrtStorage.getVariable('device_id')}";
         break;
       case '0C': //Read Message (12)
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "${hrtStorage.getVariable('Message')}";
         break;
       case '0D': //Read Tag, Descriptor, Date (13)
-        _hrtFrameWrite.body = "00" //error_code
+        _hrtFrameWrite.body = "0000" //error_code
             "${hrtStorage.getVariable('tag')}"
             "${hrtStorage.getVariable('descriptor')}"
             "${hrtStorage.getVariable('date')}";

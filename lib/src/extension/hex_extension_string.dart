@@ -6,9 +6,10 @@ extension HexExtension on String {
         : [this];
   }
 
-  String operator &(String aux) {
-    return (int.parse(this, radix: 16) & int.parse(aux, radix: 16))
+  String operator |(String aux) {
+    return (int.parse(this, radix: 16) | int.parse(aux, radix: 16))
         .toRadixString(16)
+        .toUpperCase()
         .padLeft(length > aux.length ? length : aux.length, '0');
   }
 }
