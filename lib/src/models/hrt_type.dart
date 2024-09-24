@@ -5,11 +5,15 @@ import 'dart:math';
 
 dynamic hrtTypeHexTo(String valor, String type) {
   final result = switch (type) {
-    'UInt' || 'UNSIGNED' => _hrtTypeHex2UInt(valor),
+    'UInt' ||
+    'UNSIGNED' =>
+      valor.splitByLength(2).map((e) => _hrtTypeHex2UInt(e)).join(),
     'SReal' || 'FLOAT' => _hrtTypeHex2SReal(valor),
     'Date' || 'DATE' => _hrtTypeHex2Date(valor),
     'Int' || 'INT' => _hrtTypeHex2Int(valor),
-    'PAscii' || 'PACKED_ASCII' => _hrtTypeHex2PAscii(valor),
+    'PAscii' ||
+    'PACKED_ASCII' =>
+      valor.splitByLength(6).map((e) => _hrtTypeHex2PAscii(e)).join(),
     'Time' || 'TIME' => _hrtTypeHex2Time(valor),
     _ => 'Type Invalida', //Valor padrão, substitui o default
   };

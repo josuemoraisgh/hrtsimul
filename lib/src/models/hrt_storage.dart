@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:expressions/expressions.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/hrt_settings.dart';
 import '../models/hrt_type.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -21,6 +21,10 @@ class HrtStorage {
 
   Iterable<dynamic> keys() {
     return box?.keys ?? hrtSettings.keys;
+  }
+
+  ValueListenable<Box<dynamic>>? listenable(){
+    return box?.listenable();
   }
 
   String? getVariable(String idVariable) {

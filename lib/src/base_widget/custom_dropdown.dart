@@ -1,50 +1,39 @@
 import 'package:flutter/material.dart';
 
-class DropdownBody extends StatefulWidget {
+class CustomDropdown extends StatelessWidget {
   final Map<String, String>? hrtEnum;
   final double maxWidth;
   final String id;
+  final Function(String?)? onChanged;
 
-  const DropdownBody({
+  const CustomDropdown({
     super.key,
     required this.hrtEnum,
     required this.id,
     required this.maxWidth,
+    this.onChanged,
   });
-
-  @override
-  State<DropdownBody> createState() => _DropdownBodyState();
-}
-
-class _DropdownBodyState extends State<DropdownBody> {
-  String id = "";
-
-  @override
-  void initState() {
-    id = widget.id;
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     // Verifica se o hrtEnum é nulo ou vazio
-    if (widget.hrtEnum == null || widget.hrtEnum!.isEmpty) {
+    if (hrtEnum == null || hrtEnum!.isEmpty) {
       return const Text("No data available");
     }
 
     return Center(
       child: DropdownButton<String>(
-        value: findValueFromMap(widget.hrtEnum!, id),
+        value: findValueFromMap(hrtEnum!, id),
         onChanged: (String? novoItemSelecionado) {
           if (novoItemSelecionado != null) {
-            setState(() {
-              id = widget.hrtEnum!.entries
+            if (onChanged != null) {
+              onChanged!(hrtEnum!.entries
                   .firstWhere(
                     (entry) => entry.value == novoItemSelecionado,
                     orElse: () => const MapEntry('', ''),
                   )
-                  .key;
-            });
+                  .key);
+            }
           }
         },
         style: const TextStyle(
@@ -55,14 +44,14 @@ class _DropdownBodyState extends State<DropdownBody> {
         dropdownColor: Theme.of(context).colorScheme.surface,
         focusColor: Theme.of(context).colorScheme.surface,
         selectedItemBuilder: (BuildContext context) {
-          return widget.hrtEnum!.entries
+          return hrtEnum!.entries
               .map<DropdownMenuItem<String>>(
                 (MapEntry<String, String> entry) {
                   return DropdownMenuItem<String>(
                     value: entry.value,
                     child: Container(
                       constraints: BoxConstraints(
-                        maxWidth: widget.maxWidth,
+                        maxWidth: maxWidth,
                       ),
                       alignment: Alignment.center, // Centraliza o texto
                       child: Text(
@@ -81,7 +70,7 @@ class _DropdownBodyState extends State<DropdownBody> {
               .toList()
               .cast<Widget>();
         },
-        items: widget.hrtEnum!.entries
+        items: hrtEnum!.entries
             .map((MapEntry<String, String> entry) {
               return DropdownMenuItem<String>(
                 value: entry.value,
