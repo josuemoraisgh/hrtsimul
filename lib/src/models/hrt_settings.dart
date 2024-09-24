@@ -1,5 +1,5 @@
 //NAME:(BYTE_SIZE, TYPE, DEFAULT_VALUE | @FUNCTION)
-//DEFAULT_VALUE = {TT301,LD301,FY301,DT301}
+const List<String> instrumentType = ['TT301','LD301','FY301','DT301'];
 const Map<String, (int, String, dynamic)> hrtSettings = {
   'frame_type': (1, 'UNSIGNED', '06'),
   'address_type': (1, 'UNSIGNED', '00'),

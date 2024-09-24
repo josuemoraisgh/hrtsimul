@@ -37,7 +37,6 @@ class HrtFrame {
         .reduce((value, element) =>
             (int.parse(value, radix: 16) ^ int.parse(element, radix: 16))
                 .toRadixString(16))
-        .toUpperCase()
         .padLeft(2, '0');
   }
 
@@ -46,7 +45,7 @@ class HrtFrame {
       log = "";
       final aux = _pacialFrame();
       final ck = calcCheckSum(aux);
-      return '$preamble$aux$ck';
+      return '$preamble$aux$ck'.toUpperCase();
     } catch (e) {
       log = "Incorrect Value form Frame";
     }
@@ -134,8 +133,7 @@ class HrtFrame {
       .setBits(7, 1, addressType == true ? 1 : 0) // addressType
       .setBits(0, 3, int.parse(frameType, radix: 16)) //frameType
       .toRadixString(16)
-      .padLeft(2, '0')
-      .toUpperCase();
+      .padLeft(2, '0');
 
   set delimiter(String newDelimiter) {
     final valueAux = int.parse(newDelimiter, radix: 16);
@@ -143,7 +141,7 @@ class HrtFrame {
     addressType = valueAux.getBits(7, 1) == 1 ? true : false;
     //Extrai o frame type
     frameType =
-        valueAux.getBits(0, 3).toRadixString(16).padLeft(2, '0').toUpperCase();
+        valueAux.getBits(0, 3).toRadixString(16).padLeft(2, '0');
   }
 
   //Alterando o adress tem que alterar: _masterAddress, _burstMode, _pollingAddress, manufacterId, deviceType, deviceId
@@ -161,8 +159,7 @@ class HrtFrame {
       _pollingAddress = valueAux
           .getBits(0, 6)
           .toRadixString(16)
-          .padLeft(2, '0')
-          .toUpperCase();
+          .padLeft(2, '0');
       manufacterId = "";
       deviceType = "";
       deviceId = "";
@@ -172,8 +169,7 @@ class HrtFrame {
       manufacterId = valueAux
           .getBits(0, 6)
           .toRadixString(16)
-          .padLeft(2, '0')
-          .toUpperCase();
+          .padLeft(2, '0');
       deviceType = newAddress.substring(2, 4);
       deviceId = newAddress.substring(4, 10);
     }

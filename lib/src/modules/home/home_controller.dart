@@ -6,19 +6,24 @@ import '../../extension/hex_extension_string.dart';
 import '../../models/hrt_comm.dart';
 import '../../models/hrt_build.dart';
 import '../../models/hrt_frame.dart';
+import '../../models/hrt_settings.dart';
 import '../../models/hrt_storage.dart';
 
 class HomeController extends Disposable {
   late final HrtComm hrtComm;
+  late final HrtStorage hrtStorage;  
   final connectNotifier = ValueNotifier<String>("");
   final sendNotifier = ValueNotifier<String>("");
-  String frameType = "06";
   final hrtFrameWrite = HrtFrame();
-  final hrtStorage = HrtStorage();
   final textController = TextEditingController();
   final commandController = TextEditingController();
+  final frameType = ValueNotifier<String>("06");
+  final selectedInstrument = ValueNotifier<String>(instrumentType[0]);
 
-  HomeController(this.hrtComm);
+
+  HomeController(this.hrtComm){
+    hrtStorage = HrtStorage(selectedInstrument); 
+  }
 
   Future<bool> init() async {
     await hrtStorage.init();
@@ -28,7 +33,7 @@ class HomeController extends Disposable {
   void readHrtFrame(String data) {
     final hrtResponse = HrtFrame(data);
     final aux = hrtResponse.frame.splitByLength(2).join(" ");
-    if (frameType == '06') {
+    if (frameType.value == '06') {
       textController.text += "\n$aux -> ";
       slaveMode(data);
     } else {
@@ -37,8 +42,8 @@ class HomeController extends Disposable {
   }
 
   bool masterMode(String commandWrite) {
-    hrtStorage.setVariable('master_address', '80'); //Do device para o master      
-    hrtStorage.setVariable('frame_type', frameType ); //Do master para o device
+    hrtStorage.setVariable('master_address', '80'); //Do device para o master
+    hrtStorage.setVariable('frame_type', frameType.value); //Do master para o device
     final hrtFrameRead = HrtFrame()
       ..command = commandWrite == "" ? "00" : commandWrite;
     if (hrtFrameRead.log.isEmpty) {
@@ -55,9 +60,10 @@ class HomeController extends Disposable {
     return false;
   }
 
-  Future<bool> slaveMode(String frameRead) async {//quando Slave deve ser 0
-    hrtStorage.setVariable('master_address', '80'); //Do device para o master    
-    hrtStorage.setVariable('frame_type', frameType); //Do device para o master  
+  Future<bool> slaveMode(String frameRead) async {
+    //quando Slave deve ser 0
+    hrtStorage.setVariable('master_address', '80'); //Do device para o master
+    hrtStorage.setVariable('frame_type', frameType.value); //Do device para o master
     final hrtFrameRead = HrtFrame(frameRead);
     final hrtResponse = HrtBuild(hrtStorage, hrtFrameRead);
     textController.text += hrtResponse.frame.splitByLength(2).join(" ");

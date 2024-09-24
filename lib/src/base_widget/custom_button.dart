@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatelessWidget {
   final String title;
   final String? titleOff;
-  final Color? color;
+  final Color? colorOn;
+  final Color? colorOff;
   final String initialValue;
   final ValueNotifier<String> groupValue;
   final Function(String?)? onChanged;
@@ -16,7 +17,8 @@ class CustomButton extends StatelessWidget {
     required this.initialValue,
     required this.groupValue,
     this.onChanged,
-    this.color,
+    this.colorOn,
+    this.colorOff,
   });
 
   @override
@@ -28,13 +30,14 @@ class CustomButton extends StatelessWidget {
             style: ButtonStyle(
               backgroundColor: initialValue == groupValueNotifier ||
                       groupValueNotifier == ""
-                  ? WidgetStateProperty.all<Color>(color ?? Colors.black54)
-                  : WidgetStateProperty.all<Color>(Colors.white),
+                  ? WidgetStateProperty.all<Color>(colorOn ?? Colors.black54)
+                  : WidgetStateProperty.all<Color>(colorOff ?? Colors.white),
               elevation: WidgetStateProperty.all(8),
               shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18.0),
-                  side: BorderSide(width: 0.2, color: color ?? Colors.black54),
+                  side:
+                      BorderSide(width: 0.2, color: colorOn ?? Colors.black54),
                 ),
               ),
             ),
@@ -58,7 +61,7 @@ class CustomButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 color: initialValue == groupValueNotifier ||
-                      groupValueNotifier == ""
+                        groupValueNotifier == ""
                     ? Colors.white
                     : Colors.black87,
               ),

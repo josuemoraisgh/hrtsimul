@@ -16,46 +16,45 @@ class CustomTable extends StatefulWidget {
 
 class _CustomTableState extends State<CustomTable> {
   final controller = Modular.get<HomeController>();
-  final GlobalKey _columnKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Column(
-        children: [
-          Table(
-            columnWidths: const {
-              0: FixedColumnWidth(300),
-            },
-            border: TableBorder.all(),
-            children: [
-              TableRow(
-                children: [
-                  tableCell('DESC', isHeader: true),
-                  Container(
-                    key: _columnKey,
-                    child: tableCell('VALUE', isHeader: true),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          children: [
+            Table(
+              columnWidths: const {0: FixedColumnWidth(300)},
+              border: TableBorder.all(),
+              children: [
+                TableRow(
+                  children: [
+                    tableCell('DESC', isHeader: true),
+                    tableCell('VALUE', isHeader: true),
+                  ],
+                ),
+              ],
+            ),
+            // Adicionando um contêiner com altura fixa para permitir rolagem
+            Expanded(
+              //height: MediaQuery.of(context).size.height, // Defina a altura máxima conforme necessário
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Expanded(
+                  child: Table(
+                    columnWidths: const {0: FixedColumnWidth(300)},
+                    border: TableBorder.all(),
+                    children: [
+                      for (var name in controller.hrtStorage.keys())
+                        tableLinha(name),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Table(
-                border: TableBorder.all(),
-                columnWidths: const {
-                  0: FixedColumnWidth(300),
-                },
-                children: [
-                  for (var name in controller.hrtStorage.keys())
-                    tableLinha(name),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -78,8 +77,10 @@ class _CustomTableState extends State<CustomTable> {
     return TableRow(
       children: [
         tableCell(name),
-        hrtType(hrtSettings[name]!.$2,
-            controller.hrtStorage.getVariable(name) ?? "NULL"),
+        hrtType(
+          hrtSettings[name]!.$2,
+          controller.hrtStorage.getVariable(name) ?? "NULL",
+        ),
       ],
     );
   }

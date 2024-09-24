@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:expressions/expressions.dart';
+import 'package:flutter/material.dart';
 import '../models/hrt_settings.dart';
 import '../models/hrt_type.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HrtStorage {
-  final instrument = 'TT301'; //,LD301,FY301,DT301}
   final evaluator = const ExpressionEvaluator();
+  final ValueNotifier<String> selectedInstrument;
   Box<dynamic>? box;
 
-  HrtStorage() {
+  HrtStorage(this.selectedInstrument) {
     init();
   }
 
@@ -24,14 +25,14 @@ class HrtStorage {
 
   String? getVariable(String idVariable) {
     dynamic resp = box?.get(idVariable) ?? hrtSettings[idVariable]?.$3;
-    return resp is Map ? resp[instrument] : resp;
+    return resp is Map ? resp[selectedInstrument.value] : resp;
   }
 
   void setVariable(String idVariable, String value) {
     if (box != null) {
       dynamic resp = box?.get(idVariable) ?? hrtSettings[idVariable]?.$3;
       if (resp is Map) {
-        resp[instrument] = value;
+        resp[selectedInstrument.value] = value;
       } else {
         resp = value;
       }

@@ -152,7 +152,7 @@ class HrtBuild {
         break;
       case '0B': //Read Unique Identifier Associated With Tag (11)
         _hrtFrameWrite.body =
-            "${(hrtFrameRead.body == hrtStorage.getVariable('tag')) ? '00' : '01'}" //error_code 00 - ok | 01 - undefined
+            "${(hrtFrameRead.body == hrtStorage.getVariable('tag')) ? '00' : '01'}"
             "FE"
             "${hrtStorage.getVariable('master_slave')! | hrtStorage.getVariable('manufacturer_id')!}"
             "${hrtStorage.getVariable('device_type')}"
