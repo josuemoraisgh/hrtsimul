@@ -55,7 +55,7 @@ class HrtFrame {
 
   String _pacialFrame() {
     return "$delimiter$address$command"
-        "${_nBBody.toRadixString(16).toUpperCase().padLeft(2, '0')}"
+        "${_nBBody.toRadixString(16).padLeft(2, '0')}"
         "$_body";
   }
 

@@ -176,14 +176,14 @@ class HrtBuild {
         break;
       case '0E': //Read Primary Variable Transducer Information (14)
         _hrtFrameWrite.body =
-            '00 00 00 20 44 54 80 00 C3 48 00 00 41 20 00 00';
+            '00000000002044548000C348000041200000';
         break;
       case '0F': //Read Device Information (15)
         _hrtFrameWrite.body =
-            '01 00 23 43 BA 93 33 42 92 4C CC 3F 80 00 00 01 3E';
+            '01002343BA933342924CCC3F800000013E';
         break;
       case '10': //Read Final Assembly Number (16)
-        _hrtFrameWrite.body = '00 FB C6';
+        _hrtFrameWrite.body = '000000FBC6';
         break;
       case '11': //Write Message (17)
         _hrtFrameWrite.body = '';
@@ -196,88 +196,88 @@ class HrtBuild {
         break;
       case '21': //Read Device Variables (33)
         _hrtFrameWrite.body = switch (hrtFrameRead.body) {
-          '00' => '08 00 00 00 27 40 EE 2D 42',
-          '01' => '08 00 00 01 39 41 AC 26 AA',
-          '02' => '08 00 00 02 20 41 CF 95 40',
-          '03' => '08 00 00 03 20 41 C8 D9 90',
-          '04' => '08 00 00 04 39 41 AC 26 21',
-          '05' => '08 00 00 05 39 00 00 00 00',
-          '0C' => '08 00 00 0C 33 3F 80 00 00',
-          '19' => '08 00 40 19 00 42 DD 26 1B',
-          _ => '08 00 00 00 00 7F A0 00 00',
+          '00' => '0000002740EE2D42',
+          '01' => '0000013941AC26AA',
+          '02' => '0000022041CF9540',
+          '03' => '0000032041C8D990',
+          '04' => '0000043941AC2621',
+          '05' => '0000053900000000',
+          '0C' => '00000C333F800000',
+          '19' => '0040190042DD261B',
+          _ =>    '000000007FA00000',
         };
         break;
       case '26': //Resetar as Flags de Erro (38)
-        _hrtFrameWrite.body = 'E6 3F 3F';
+        _hrtFrameWrite.body = '020000E63F3F';
         break;
       case '28': //Enter/Exit Fixed Current Mode (40)
-        _hrtFrameWrite.body = '28 06 00 40 00 00 00 00';
+        _hrtFrameWrite.body = '2806004000000000';
         break;
       case '29': //Perform Self Test (41)
-        _hrtFrameWrite.body = '02 40 20';
+        _hrtFrameWrite.body = '4020';
         break;
       case '2A': //Perform Device Reset (42)
-        _hrtFrameWrite.body = '02 00 00';
+        _hrtFrameWrite.body = '0000';
         break;
       case '2D': //Trim/Adjusting the 4 mA (45)
-        _hrtFrameWrite.body = '02 09 00';
+        _hrtFrameWrite.body = '0900';
         break;
       case '2E': //Trim/Adjusting the 20 mA (46)
-        _hrtFrameWrite.body = '02 09 00';
+        _hrtFrameWrite.body = '0900';
         break;
       case '50': //Read Dynamic Variable Assignments (80)
-        _hrtFrameWrite.body = '50 00';
+        _hrtFrameWrite.body = '5000';
         break;
       case '82': //Write Device Variable Trim Point (130)
-        _hrtFrameWrite.body = '07 00 00 02 01 02 01 01';
+        _hrtFrameWrite.body = '00000201020101';
         break;
       case '84': //Comando 132 -
-        _hrtFrameWrite.body = '0D 00 00 02 01 25 43 D2 00 00 40 A9 99 99';
+        _hrtFrameWrite.body = '000002012543D2000040A99999';
         break;
       case '87': //Write I/O System Master Mode (135)
-        _hrtFrameWrite.body = '04 00 40 02 01';
+        _hrtFrameWrite.body = '00400201';
         break;
       case '88': //Comando 136 -
-        _hrtFrameWrite.body = '06 70 00 02 FF FF FF';
+        _hrtFrameWrite.body = '700002FFFFFF';
         break;
       case '8A': //Comando 8A -
-        _hrtFrameWrite.body = '04 00 00 02 FF';
+        _hrtFrameWrite.body = '000002FF';
         break;
       case '8C': //Comando 8C -
         _hrtFrameWrite.body =
-            '19 70 00 02 39 41 AC 33 E9 39 00 00 00 00 39 42 48 00 00 FF FF 39 00 00 00 00';
+            '7000023941AC33E939000000003942480000FFFF3900000000';
         break;
       case '98': //Comando 98 -
         _hrtFrameWrite.body = '';
         break;
       case 'A2': //Comando A2 -
-        _hrtFrameWrite.body = '04 00 00 02 01';
+        _hrtFrameWrite.body = '00000201';
         break;
       case 'A4': //Comando A4 -
-        _hrtFrameWrite.body = '05 00 00 02 02 00';
+        _hrtFrameWrite.body = '0000020200';
         break;
       case 'A6': //Comando A6 -
-        _hrtFrameWrite.body = '0F 00 00 02 22 04 00 00 13 0A 27 00 00 01 0B 00';
+        _hrtFrameWrite.body = '00000222040000130A270000010B00';
         break;
       case 'A8': //Comando A8 -
-        _hrtFrameWrite.body = '05 00 00 02 01 FF';
+        _hrtFrameWrite.body = '00000201FF';
         break;
       case 'AD': //Comando AD -
         _hrtFrameWrite.body =
-            '18 00 00 02 54 54 33 30 31 31 31 31 30 2D 42 55 49 31 4C 33 50 30 54 34 59';
+            '0000025454333031313131302D425549314C335030543459';
         break;
       case 'B9': //Comando B9 -
-        _hrtFrameWrite.body = '03 00 40 02';
+        _hrtFrameWrite.body = '004002';
         break;
       case 'BB': //Comando BB -
-        _hrtFrameWrite.body = '04 00 00 02 FF';
+        _hrtFrameWrite.body = '000002FF';
         break;
       case 'C6': //Comando C6 -
-        _hrtFrameWrite.body = '07 00 00 02 42 48 00 00';
+        _hrtFrameWrite.body = '00000242480000';
         break;
       case 'DF': //Comando DF -
         _hrtFrameWrite.body =
-            '13 00 00 02 42 C8 00 00 3B 80 11 32 B5 1B 05 7F AC 93 2D 1D';
+            '00000242C800003B801132B51B057FAC932D1D';
         break;
     }
   }
