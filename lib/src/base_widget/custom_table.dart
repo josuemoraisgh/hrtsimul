@@ -38,18 +38,15 @@ class _CustomTableState extends State<CustomTable> {
             ),
             // Adicionando um contêiner com altura fixa para permitir rolagem
             Expanded(
-              //height: MediaQuery.of(context).size.height, // Defina a altura máxima conforme necessário
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
-                child: Expanded(
-                  child: Table(
-                    columnWidths: const {0: FixedColumnWidth(300)},
-                    border: TableBorder.all(),
-                    children: [
-                      for (var name in controller.hrtStorage.keys())
-                        tableLinha(name),
-                    ],
-                  ),
+                child: Table(
+                  columnWidths: const {0: FixedColumnWidth(300)},
+                  border: TableBorder.all(),
+                  children: [
+                    for (var name in controller.hrtStorage.keys())
+                      tableLinha(name),
+                  ],
                 ),
               ),
             ),
