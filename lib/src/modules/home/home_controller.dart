@@ -45,7 +45,7 @@ class HomeController extends Disposable {
     hrtStorage.setVariable('master_address', '80'); //Do device para o master
     hrtStorage.setVariable('frame_type', frameType.value); //Do master para o device
     final hrtFrameRead = HrtFrame()
-      ..command = commandWrite == "" ? "00" : commandWrite;
+      ..command = commandWrite == "" ? "00" : commandWrite.padLeft(2, '0');
     if (hrtFrameRead.log.isEmpty) {
       final hrtRequest = HrtBuild(hrtStorage, hrtFrameRead);
       final valueAux = hrtRequest.frame;
