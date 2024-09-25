@@ -103,7 +103,10 @@ class _CustomTableState extends State<CustomTable> {
         _hrtTypeHex2Enun(int.parse(s.substring(s.length - 2)), name),
       'SReal' || 'FLOAT' => _tableTextField(
           controller.hrtStorage.hrtFunc2Double(name).toString(),
-          readOnly: value.substring(0, 1) == '@',
+          onSubmitted: (newValue) {
+            controller.hrtStorage.setVariable(
+                name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
+          },
         ),
       _ => _tableTextField(hrtTypeHexTo(value, type).toString()),
     };
@@ -114,7 +117,7 @@ class _CustomTableState extends State<CustomTable> {
     bool isHeader = false,
     Color? color,
     Color? txtColor,
-    bool readOnly = true,
+    void Function(String)? onSubmitted,
   }) {
     return Container(
       color: color,
@@ -135,11 +138,12 @@ class _CustomTableState extends State<CustomTable> {
           fontSize: 16,
           fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
         ),
-        readOnly: readOnly,
-        onChanged: (newValue) {
+        readOnly: onSubmitted == null,
+        onSubmitted: (newValue) {
           setState(() {
-            controller.hrtStorage.setVariable(
-                newValue, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
+            if (onSubmitted != null) {
+              onSubmitted(newValue);
+            }
           });
         },
       ),

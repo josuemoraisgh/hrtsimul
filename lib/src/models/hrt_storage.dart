@@ -20,6 +20,7 @@ class HrtStorage {
   }
 
   Iterable<dynamic> keys() {
+    //box?.deleteAll()
     return box?.keys ?? hrtSettings.keys;
   }
 
