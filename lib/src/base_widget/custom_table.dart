@@ -48,16 +48,19 @@ class _CustomTableState extends State<CustomTable> {
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
-                child: Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(1.0),
-                    1: FlexColumnWidth(2.0)
-                  },
-                  border: TableBorder.all(),
-                  children: [
-                    for (var name in controller.hrtStorage.keys())
-                      tableLinha(name),
-                  ],
+                child: ValueListenableBuilder(
+                  valueListenable: controller.hrtStorage.listenable()!,
+                  builder: (___, __, _) => Table(
+                    columnWidths: const {
+                      0: FlexColumnWidth(1.0),
+                      1: FlexColumnWidth(2.0)
+                    },
+                    border: TableBorder.all(),
+                    children: [
+                      for (var name in controller.hrtStorage.keys())
+                        tableLinha(name),
+                    ],
+                  ),
                 ),
               ),
             ),
