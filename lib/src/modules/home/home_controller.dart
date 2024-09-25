@@ -11,7 +11,8 @@ import '../../models/hrt_storage.dart';
 
 class HomeController extends Disposable {
   late final HrtComm hrtComm;
-  late final HrtStorage hrtStorage;  
+  late final HrtStorage hrtStorage;
+  final changeFuncion = ValueNotifier<bool>(true);   
   final connectNotifier = ValueNotifier<String>("");
   final sendNotifier = ValueNotifier<String>("");
   final hrtFrameWrite = HrtFrame();

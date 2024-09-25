@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import '../../base_widget/custom_table.dart';
+import '../../base_widget/custom_tanque.dart';
 import '../../models/hrt_settings.dart';
 import './home_controller.dart';
 import '../../base_widget/custom_button.dart';
@@ -37,7 +38,12 @@ class _HomePageState extends State<HomePage> {
               children: [
                 _buildTitle(),
                 const SizedBox(height: 10),
-                const CustomTable(),
+                Expanded(
+                  child: Row(children: [
+                    CustomTank(),
+                    const CustomTable(),
+                  ]),
+                ),
                 const SizedBox(height: 10),
                 _buildLogContainer(),
                 const SizedBox(height: 10),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CustomDropdown extends StatelessWidget {
+class CustomDropdown extends StatefulWidget {
   final Map<String, String>? hrtEnum;
   final double maxWidth;
   final String id;
   final Function(String?)? onChanged;
-
   const CustomDropdown({
     super.key,
     required this.hrtEnum,
@@ -15,24 +14,40 @@ class CustomDropdown extends StatelessWidget {
   });
 
   @override
+  State<CustomDropdown> createState() => _CustomDropdownState();
+}
+
+class _CustomDropdownState extends State<CustomDropdown> {
+  late String id;
+
+  @override
+  void initState() {
+    id = widget.id;    
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Verifica se o hrtEnum é nulo ou vazio
-    if (hrtEnum == null || hrtEnum!.isEmpty) {
+    if (widget.hrtEnum == null || widget.hrtEnum!.isEmpty) {
       return const Text("No data available");
     }
 
     return Center(
       child: DropdownButton<String>(
-        value: findValueFromMap(hrtEnum!, id),
+        value: findValueFromMap(widget.hrtEnum!, id),
         onChanged: (String? novoItemSelecionado) {
           if (novoItemSelecionado != null) {
-            if (onChanged != null) {
-              onChanged!(hrtEnum!.entries
-                  .firstWhere(
-                    (entry) => entry.value == novoItemSelecionado,
-                    orElse: () => const MapEntry('', ''),
-                  )
-                  .key);
+            if (widget.onChanged != null) {
+              setState(() {
+                id = widget.hrtEnum!.entries
+                    .firstWhere(
+                      (entry) => entry.value == novoItemSelecionado,
+                      orElse: () => const MapEntry('', ''),
+                    )
+                    .key;
+                widget.onChanged!(id);
+              });
             }
           }
         },
@@ -44,14 +59,14 @@ class CustomDropdown extends StatelessWidget {
         dropdownColor: Theme.of(context).colorScheme.surface,
         focusColor: Theme.of(context).colorScheme.surface,
         selectedItemBuilder: (BuildContext context) {
-          return hrtEnum!.entries
+          return widget.hrtEnum!.entries
               .map<DropdownMenuItem<String>>(
                 (MapEntry<String, String> entry) {
                   return DropdownMenuItem<String>(
                     value: entry.value,
                     child: Container(
                       constraints: BoxConstraints(
-                        maxWidth: maxWidth,
+                        maxWidth: widget.maxWidth,
                       ),
                       alignment: Alignment.center, // Centraliza o texto
                       child: Text(
@@ -70,7 +85,7 @@ class CustomDropdown extends StatelessWidget {
               .toList()
               .cast<Widget>();
         },
-        items: hrtEnum!.entries
+        items: widget.hrtEnum!.entries
             .map((MapEntry<String, String> entry) {
               return DropdownMenuItem<String>(
                 value: entry.value,

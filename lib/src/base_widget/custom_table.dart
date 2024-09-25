@@ -18,50 +18,24 @@ class _CustomTableState extends State<CustomTable> {
 
   @override
   Widget build(BuildContext context) {
+    // Converte keys() para uma lista
+    final hrtKeys = controller.hrtStorage.keys().toList();
+
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20),
         child: Column(
           children: [
-            Table(
-              columnWidths: const {
-                0: FlexColumnWidth(1.0),
-                1: FlexColumnWidth(2.0) /*FixedColumnWidth(300)*/
-              },
-              border: TableBorder.all(),
-              children: [
-                TableRow(
-                  children: [
-                    _tableTextField('DESC',
-                        isHeader: true,
-                        color: Colors.blue,
-                        txtColor: Colors.white),
-                    _tableTextField('VALUE',
-                        isHeader: true,
-                        color: Colors.blue,
-                        txtColor: Colors.white),
-                  ],
-                ),
-              ],
-            ),
+            // Cabeçalho (header)
+            _buildHeader(),
             // Adicionando um contêiner com altura fixa para permitir rolagem
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: ValueListenableBuilder(
-                  valueListenable: controller.hrtStorage.listenable()!,
-                  builder: (___, __, _) => Table(
-                    columnWidths: const {
-                      0: FlexColumnWidth(1.0),
-                      1: FlexColumnWidth(2.0)
-                    },
-                    border: TableBorder.all(),
-                    children: [
-                      for (var name in controller.hrtStorage.keys())
-                        tableLinha(name),
-                    ],
-                  ),
-                ),
+              child: ListView.builder(
+                itemCount: hrtKeys.length, // Usar o comprimento da lista correta
+                itemBuilder: (context, index) {
+                  final name = hrtKeys[index]; // Acessar pelo índice correto
+                  return _buildListRow(name);
+                },
               ),
             ),
           ],
@@ -70,32 +44,76 @@ class _CustomTableState extends State<CustomTable> {
     );
   }
 
-  TableRow tableLinha(String name) {
-    return TableRow(
-      children: [
-        _tableTextField(name, color: Colors.blue, txtColor: Colors.white),
-        _hrtType(
-          hrtSettings[name]!.$2,
-          name,
-        ),
-      ],
+  Widget _buildHeader() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: _tableTextField('DESC', isHeader: true, color: Colors.blue, txtColor: Colors.white),
+          ),
+          Expanded(
+            flex: 2,
+            child: _tableTextField('VALUE', isHeader: true, color: Colors.blue, txtColor: Colors.white),
+          ),
+        ],
+      ),
     );
   }
 
-  // Widget _tableCell(String text, {bool isHeader = false, Color? color}) {
-  //   return Container(
-  //     color: color,
-  //     padding: const EdgeInsets.all(8.0),
-  //     child: Text(
-  //       text,
-  //       textAlign: TextAlign.center,
-  //       style: TextStyle(
-  //         fontSize: 16,
-  //         fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildListRow(String name) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black), // Simula as linhas de grade
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: _tableTextField(name, color: Colors.blue, txtColor: Colors.white),
+          ),
+          Expanded(
+            flex: 2,
+            child: _hrtType(hrtSettings[name]!.$2, name),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tableTextField(
+    String text, {
+    bool isHeader = false,
+    Color? color,
+    Color? txtColor,
+    void Function(String)? onChanged,
+  }) {
+    return Container(
+      color: color,
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: TextEditingController(text: text),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: txtColor,
+          fontSize: 16,
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+        ),
+        decoration: InputDecoration(
+          border: InputBorder.none,
+        ),
+        readOnly: onChanged == null,
+        onChanged: (newValue) {
+          if (onChanged != null && newValue.isNotEmpty && double.tryParse(newValue) != null) {
+            onChanged(newValue);
+          }
+        },
+      ),
+    );
+  }
 
   Widget _hrtType(String type, String name) {
     final String value = controller.hrtStorage.getVariable(name) ?? "NULL";
@@ -104,59 +122,25 @@ class _CustomTableState extends State<CustomTable> {
         _tableTextField("", color: Colors.red),
       (String s) when s.contains('ENUM') =>
         _hrtTypeHex2Enun(int.parse(s.substring(s.length - 2)), name),
-      'SReal' || 'FLOAT' => _tableTextField(
-          controller.hrtStorage.hrtFunc2Double(name).toString(),
-          onSubmitted: (newValue) {
-            controller.hrtStorage.setVariable(
-                name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
-          },
-        ),
+      'SReal' || 'FLOAT' => value.substring(0, 1) == '@'
+          ? ValueListenableBuilder(
+              valueListenable: controller.changeFuncion,
+              builder: (___, __, _) => _tableTextField(
+                  controller.hrtStorage.hrtFunc2Double(name).toString()),
+            )
+          : _tableTextField(
+              controller.hrtStorage.hrtFunc2Double(name).toString(),
+              onChanged: (newValue) {
+                controller.hrtStorage.setVariable(
+                    name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
+                controller.changeFuncion.value = !controller.changeFuncion.value;
+              },
+            ),
       _ => _tableTextField(hrtTypeHexTo(value, type).toString()),
     };
   }
 
-  Widget _tableTextField(
-    String text, {
-    bool isHeader = false,
-    Color? color,
-    Color? txtColor,
-    void Function(String)? onSubmitted,
-  }) {
-    return Container(
-      color: color,
-      padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: text, // Mantém o texto como placeholder
-          hintStyle: TextStyle(
-            color: txtColor, // Altere essa cor conforme necessário
-            fontSize: 16,
-            fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          ),
-          border: InputBorder.none,
-        ),
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: txtColor,
-          fontSize: 16,
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-        ),
-        readOnly: onSubmitted == null,
-        onSubmitted: (newValue) {
-          setState(() {
-            if (onSubmitted != null) {
-              onSubmitted(newValue);
-            }
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _hrtTypeHex2Enun(
-    int enumId,
-    String name,
-  ) {
+  Widget _hrtTypeHex2Enun(int enumId, String name) {
     final String value = controller.hrtStorage.getVariable(name) ?? "NULL";
     return LayoutBuilder(builder: (context, constraints) {
       final size = constraints.maxWidth; // Obtém a largura atual
@@ -165,11 +149,9 @@ class _CustomTableState extends State<CustomTable> {
           hrtEnum: hrtEnum[enumId],
           maxWidth: size - 24,
           onChanged: (id) {
-            setState(() {
-              if (id != null) {
-                controller.hrtStorage.setVariable(name, id);
-              }
-            });
+            if (id != null) {
+              controller.hrtStorage.setVariable(name, id);
+            }
           });
     });
   }

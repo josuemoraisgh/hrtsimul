@@ -15,17 +15,12 @@ class HrtStorage {
   }
 
   Future<bool> init() async {
-    box ??= await Hive.openBox<String>('HRTSTORAGE');
+    box ??= await Hive.openBox<dynamic>('HRTSTORAGE');
     return true;
   }
 
   Iterable<dynamic> keys() {
-    //box?.deleteAll()
     return box?.keys ?? hrtSettings.keys;
-  }
-
-  ValueListenable<Box<dynamic>>? listenable(){
-    return box?.listenable();
   }
 
   String? getVariable(String idVariable) {
@@ -37,17 +32,20 @@ class HrtStorage {
     if (box != null) {
       dynamic resp = box?.get(idVariable) ?? hrtSettings[idVariable]?.$3;
       if (resp is Map) {
-        resp[selectedInstrument.value] = value;
+        box!.put(
+            idVariable,
+            (resp.map((key, val) => resp[selectedInstrument.value] == key
+                ? MapEntry<String, String>(key, value)
+                : MapEntry<String, String>(key, val))) as dynamic);
       } else {
-        resp = value;
+        box!.put(idVariable, value);
       }
-      box!.put(idVariable, resp);
     }
   }
 
   double? hrtFunc2Double(String idVariable1) {
     final value = getVariable(idVariable1);
-    if(value == null) return 0;    
+    if (value == null) return 0;
     if (value.substring(0, 1) != '@') return hrtTypeHexTo(value, 'FLOAT');
     final iReg = RegExp(
         r'[A-Z_a-z]+'); //RegExp(r'\b\w+\b'); // Regex para capturar palavras
