@@ -65,7 +65,7 @@ const Map<String, (int, String, dynamic)> hrtSettings = {
   'loop_current': (4, 'FLOAT', '@(percent_of_range*0.16)+4'),
   'write_protect': (1, 'ENUM00', '00'),
   'private_label_distributor': (1, 'ENUM00', '00'),
-  'final_assembly_number': (3, 'UNSIGNED', '00'),
+  'final_assembly_number': (3, 'UNSIGNED', '000000'),
   'physical_signaling_code': (1, 'ENUM10', '00'), //(Bell  202  Current)
   'units_code': (1, 'ENUM02', '20'), //(32 - Degrees Celsius)
   'transfer_function_code': (1, 'ENUM03', '00'), //(0 - Linear)

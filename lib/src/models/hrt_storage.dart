@@ -44,7 +44,9 @@ class HrtStorage {
     }
   }
 
-  double? hrtFunc2Double(String value) {
+  double? hrtFunc2Double(String idVariable1) {
+    final value = getVariable(idVariable1);
+    if(value == null) return 0;    
     if (value.substring(0, 1) != '@') return hrtTypeHexTo(value, 'FLOAT');
     final iReg = RegExp(
         r'[A-Z_a-z]+'); //RegExp(r'\b\w+\b'); // Regex para capturar palavras

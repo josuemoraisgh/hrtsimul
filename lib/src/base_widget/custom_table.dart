@@ -32,9 +32,14 @@ class _CustomTableState extends State<CustomTable> {
               children: [
                 TableRow(
                   children: [
-                    _tableTextField('DESC', isHeader: true, color: Colors.blue),
+                    _tableTextField('DESC',
+                        isHeader: true,
+                        color: Colors.blue,
+                        txtColor: Colors.white),
                     _tableTextField('VALUE',
-                        isHeader: true, color: Colors.blue),
+                        isHeader: true,
+                        color: Colors.blue,
+                        txtColor: Colors.white),
                   ],
                 ),
               ],
@@ -65,7 +70,7 @@ class _CustomTableState extends State<CustomTable> {
   TableRow tableLinha(String name) {
     return TableRow(
       children: [
-        _tableTextField(name, color: Colors.blue),
+        _tableTextField(name, color: Colors.blue, txtColor: Colors.white),
         _hrtType(
           hrtSettings[name]!.$2,
           name,
@@ -93,59 +98,72 @@ class _CustomTableState extends State<CustomTable> {
     final String value = controller.hrtStorage.getVariable(name) ?? "NULL";
     return switch (type) {
       (String s) when s.contains('BIT_ENUM') =>
-        _hrtTypeHex2BitEnum(int.parse(s.substring(s.length - 2)), name),
+        _tableTextField("", color: Colors.red),
       (String s) when s.contains('ENUM') =>
         _hrtTypeHex2Enun(int.parse(s.substring(s.length - 2)), name),
-      'SReal' ||
-      'FLOAT' =>
-        _tableTextField(controller.hrtStorage.hrtFunc2Hex(name) ?? ""),
+      'SReal' || 'FLOAT' => _tableTextField(
+          controller.hrtStorage.hrtFunc2Double(name).toString(),
+          readOnly: value.substring(0, 1) == '@',
+        ),
       _ => _tableTextField(hrtTypeHexTo(value, type).toString()),
     };
   }
 
-  Widget _hrtTypeHex2BitEnum(int enumId, String value) {
-    return Container();
-  }
-
-  Widget _hrtTypeHex2Enun(int enumId, String name) {
-    final String value = controller.hrtStorage.getVariable(name) ?? "NULL";
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = constraints.maxWidth; // Obtém a largura atual
-        return CustomDropdown(
-            id: value.substring(value.length - 2),
-            hrtEnum: hrtEnum[enumId],
-            maxWidth: size - 24,
-            onChanged: (id) {
-              setState(() {
-                if (id != null) {
-                  controller.hrtStorage.setVariable(name, id);
-                }
-              });
-            });
-      },
-    );
-  }
-
-  Widget _tableTextField(String text, {bool isHeader = false, Color? color}) {
+  Widget _tableTextField(
+    String text, {
+    bool isHeader = false,
+    Color? color,
+    Color? txtColor,
+    bool readOnly = true,
+  }) {
     return Container(
       color: color,
       padding: const EdgeInsets.all(8.0),
       child: TextField(
-        // Controlador para armazenar o valor
         decoration: InputDecoration(
           hintText: text, // Mantém o texto como placeholder
+          hintStyle: TextStyle(
+            color: txtColor, // Altere essa cor conforme necessário
+            fontSize: 16,
+            fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+          ),
           border: InputBorder.none,
         ),
         textAlign: TextAlign.center,
         style: TextStyle(
+          color: txtColor,
           fontSize: 16,
           fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
         ),
+        readOnly: readOnly,
         onChanged: (newValue) {
-          setState(() {});
+          setState(() {
+            controller.hrtStorage.setVariable(
+                newValue, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
+          });
         },
       ),
     );
+  }
+
+  Widget _hrtTypeHex2Enun(
+    int enumId,
+    String name,
+  ) {
+    final String value = controller.hrtStorage.getVariable(name) ?? "NULL";
+    return LayoutBuilder(builder: (context, constraints) {
+      final size = constraints.maxWidth; // Obtém a largura atual
+      return CustomDropdown(
+          id: value.substring(value.length - 2),
+          hrtEnum: hrtEnum[enumId],
+          maxWidth: size - 24,
+          onChanged: (id) {
+            setState(() {
+              if (id != null) {
+                controller.hrtStorage.setVariable(name, id);
+              }
+            });
+          });
+    });
   }
 }
