@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hrtsimul/src/models/hrt_translate.dart';
 import '../../extension/hex_extension_string.dart';
 import '../../models/hrt_comm.dart';
 import '../../models/hrt_build.dart';
@@ -12,8 +13,8 @@ import '../../models/hrt_storage.dart';
 class HomeController extends Disposable {
   late final HrtComm hrtComm;
   late final HrtStorage hrtStorage;
-  final changeFuncion = ValueNotifier<bool>(true);   
-  final connectNotifier = ValueNotifier<String>("");
+  late final HrtTranslate hrtTranslate;   
+  final connectNotifier = ValueNotifier<String>("");  
   final sendNotifier = ValueNotifier<String>("");
   final hrtFrameWrite = HrtFrame();
   final textController = TextEditingController();
@@ -23,7 +24,8 @@ class HomeController extends Disposable {
 
 
   HomeController(this.hrtComm){
-    hrtStorage = HrtStorage(selectedInstrument); 
+    hrtStorage = HrtStorage(selectedInstrument);
+    hrtTranslate = HrtTranslate(hrtStorage);
   }
 
   Future<bool> init() async {
@@ -62,7 +64,7 @@ class HomeController extends Disposable {
   }
 
   Future<bool> slaveMode(String frameRead) async {
-    //quando Slave deve ser 0
+    //quando slave deve ser 0
     hrtStorage.setVariable('master_address', '80'); //Do device para o master
     hrtStorage.setVariable('frame_type', frameType.value); //Do device para o master
     final hrtFrameRead = HrtFrame(frameRead);

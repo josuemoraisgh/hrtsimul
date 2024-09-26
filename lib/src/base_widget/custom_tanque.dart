@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class CustomTank extends StatefulWidget {
@@ -14,17 +11,6 @@ class _CustomTankState extends State<CustomTank> {
   @override
   void initState() {
     super.initState();
-    _randomizeLevel();
-  }
-
-  void _randomizeLevel() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        // Gera um nível aleatório entre 0 e 100
-        _currentLevel += 5.0;
-        if (_currentLevel > 100.0) _currentLevel = 0.0;
-      });
-    });
   }
 
   @override

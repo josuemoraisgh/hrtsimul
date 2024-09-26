@@ -1,6 +1,8 @@
 //NAME:(BYTE_SIZE, TYPE, DEFAULT_VALUE | @FUNCTION)
 const List<String> instrumentType = ['TT301','LD301','FY301','DT301'];
 const Map<String, (int, String, dynamic)> hrtSettings = {
+  'ramp_value': (4, 'FLOAT', '#ramp_value'),
+  'ramdom_value': (4, 'FLOAT', '#ramdom_value'),
   'frame_type': (1, 'UNSIGNED', '06'),
   'address_type': (1, 'UNSIGNED', '00'),
   'error_code': (2, 'ENUM00', '0040'),
@@ -12,7 +14,7 @@ const Map<String, (int, String, dynamic)> hrtSettings = {
   'device_type': (
     1,
     'ENUM01',
-    {'TT301': '02', 'LD301': '07', 'FY301': '01', 'DT301': '06'}
+    {'TT301': '02', 'LD301': '01', 'FY301': '01', 'DT301': '06'}
   ),
   'request_preambles': (1, 'UNSIGNED', '05'),
   'hart_revision': (1, 'UNSIGNED', '05'),
@@ -55,7 +57,7 @@ const Map<String, (int, String, dynamic)> hrtSettings = {
   'date': (3, 'DATE', '130879'), //19/08/2021
   'upper_range_value': (4, 'FLOAT', '44548000'), //850
   'lower_range_value': (4, 'FLOAT', 'C3480000'), //-200
-  'PROCESS_VARIABLE': (4, 'FLOAT', '42480000'), //50
+  'PROCESS_VARIABLE': (4, 'FLOAT', '@100*ramp_value'), //50
   'percent_of_range': (
     4,
     'FLOAT',

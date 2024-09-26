@@ -31,7 +31,8 @@ class _CustomTableState extends State<CustomTable> {
             // Adicionando um contêiner com altura fixa para permitir rolagem
             Expanded(
               child: ListView.builder(
-                itemCount: hrtKeys.length, // Usar o comprimento da lista correta
+                itemCount:
+                    hrtKeys.length, // Usar o comprimento da lista correta
                 itemBuilder: (context, index) {
                   final name = hrtKeys[index]; // Acessar pelo índice correto
                   return _buildListRow(name);
@@ -53,11 +54,13 @@ class _CustomTableState extends State<CustomTable> {
         children: [
           Expanded(
             flex: 1,
-            child: _tableTextField('DESC', isHeader: true, color: Colors.blue, txtColor: Colors.white),
+            child: _tableTextField('DESC',
+                isHeader: true, color: Colors.blue, txtColor: Colors.white),
           ),
           Expanded(
             flex: 2,
-            child: _tableTextField('VALUE', isHeader: true, color: Colors.blue, txtColor: Colors.white),
+            child: _tableTextField('VALUE',
+                isHeader: true, color: Colors.blue, txtColor: Colors.white),
           ),
         ],
       ),
@@ -73,7 +76,8 @@ class _CustomTableState extends State<CustomTable> {
         children: [
           Expanded(
             flex: 1,
-            child: _tableTextField(name, color: Colors.blue, txtColor: Colors.white),
+            child: _tableTextField(name,
+                color: Colors.blue, txtColor: Colors.white),
           ),
           Expanded(
             flex: 2,
@@ -107,7 +111,9 @@ class _CustomTableState extends State<CustomTable> {
         ),
         readOnly: onChanged == null,
         onChanged: (newValue) {
-          if (onChanged != null && newValue.isNotEmpty && double.tryParse(newValue) != null) {
+          if (onChanged != null &&
+              newValue.isNotEmpty &&
+              double.tryParse(newValue) != null) {
             onChanged(newValue);
           }
         },
@@ -122,20 +128,21 @@ class _CustomTableState extends State<CustomTable> {
         _tableTextField("", color: Colors.red),
       (String s) when s.contains('ENUM') =>
         _hrtTypeHex2Enun(int.parse(s.substring(s.length - 2)), name),
-      'SReal' || 'FLOAT' => value.substring(0, 1) == '@'
-          ? ValueListenableBuilder(
-              valueListenable: controller.changeFuncion,
-              builder: (___, __, _) => _tableTextField(
-                  controller.hrtStorage.hrtFunc2Double(name).toString()),
-            )
-          : _tableTextField(
-              controller.hrtStorage.hrtFunc2Double(name).toString(),
-              onChanged: (newValue) {
-                controller.hrtStorage.setVariable(
-                    name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
-                controller.changeFuncion.value = !controller.changeFuncion.value;
-              },
-            ),
+      'SReal' ||
+      'FLOAT' =>
+        value.substring(0, 1) == '@' || value.substring(0, 1) == '#'
+            ? ValueListenableBuilder(
+                valueListenable: controller.hrtTranslate.updateValueFunc,
+                builder: (___, __, _) => _tableTextField(
+                    controller.hrtTranslate.hrtFunc2Double(name).toString()),
+              )
+            : _tableTextField(
+                controller.hrtTranslate.hrtFunc2Double(name).toString(),
+                onChanged: (newValue) {
+                  controller.hrtStorage.setVariable(
+                      name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
+                },
+              ),
       _ => _tableTextField(hrtTypeHexTo(value, type).toString()),
     };
   }
