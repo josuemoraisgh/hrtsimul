@@ -122,7 +122,7 @@ class _CustomTableState extends State<CustomTable> {
   }
 
   Widget _hrtType(String type, String name) {
-    final String value = controller.hrtStorage.getVariable(name) ?? "NULL";
+    final String func = controller.hrtStorage.getVariable(name) ?? "NULL";
     return switch (type) {
       (String s) when s.contains('BIT_ENUM') =>
         _tableTextField("", color: Colors.red),
@@ -130,20 +130,20 @@ class _CustomTableState extends State<CustomTable> {
         _hrtTypeHex2Enun(int.parse(s.substring(s.length - 2)), name),
       'SReal' ||
       'FLOAT' =>
-        value.substring(0, 1) == '@' || value.substring(0, 1) == '#'
+        func.substring(0, 1) == '@' || func.substring(0, 1) == '#'
             ? ValueListenableBuilder(
-                valueListenable: controller.hrtTranslate.updateValueFunc,
+                valueListenable: controller.hrtTransmitter.updateValueFunc,
                 builder: (___, __, _) => _tableTextField(
-                    controller.hrtTranslate.hrtFunc2Double(name).toString()),
+                    controller.hrtTransmitter.getValue(func).toString()),
               )
             : _tableTextField(
-                controller.hrtTranslate.hrtFunc2Double(name).toString(),
+                controller.hrtTransmitter.getValue(func).toString(),
                 onChanged: (newValue) {
                   controller.hrtStorage.setVariable(
                       name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
                 },
               ),
-      _ => _tableTextField(hrtTypeHexTo(value, type).toString()),
+      _ => _tableTextField(hrtTypeHexTo(func, type).toString()),
     };
   }
 

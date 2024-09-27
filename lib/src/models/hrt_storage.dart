@@ -16,7 +16,8 @@ class HrtStorage {
   }
 
   Future<bool> init() async {
-    box ??= await Hive.openBox<dynamic>('HRTSTORAGE');
+    if (!Hive.isBoxOpen('HRTSTORAGE'))
+      box ??= await Hive.openBox<dynamic>('HRTSTORAGE');
     return true;
   }
 

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+
+import '../modules/home/home_controller.dart';
 
 class CustomTank extends StatefulWidget {
+  final String varkey;
+
+  CustomTank(this.varkey) {}
+
   @override
   _CustomTankState createState() => _CustomTankState();
 }
 
 class _CustomTankState extends State<CustomTank> {
-  double _currentLevel = 0.0; // Nível do tanque
+  final controller = Modular.get<HomeController>();
 
   @override
   void initState() {
@@ -24,32 +31,38 @@ class _CustomTankState extends State<CustomTank> {
           border: Border.all(color: Colors.black, width: 2),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            // Visor de nível
-            Container(
-              width: 200, // Largura do líquido
-              height: (_currentLevel / 100) * 400, // Altura do nível
-              decoration: BoxDecoration(
-                color: Colors.blue, // Cor do líquido
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-
-            // Texto para mostrar o nível
-            Positioned(
-              bottom: (_currentLevel / 100) * 400 + 10,
-              child: Text(
-                '${_currentLevel.toStringAsFixed(1)}%',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+        child: ValueListenableBuilder(
+          valueListenable: controller.hrtTransmitter.updateValueFunc,
+          builder: (___, __, _) {
+            final _currentLevel = controller.hrtTransmitter.funcNotifier.value[widget.varkey]?.$2 ?? 0.0;
+            return Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                // Visor de nível
+                Container(
+                  width: 200, // Largura do líquido
+                  height: (_currentLevel / 100) * 400, // Altura do nível
+                  decoration: BoxDecoration(
+                    color: Colors.blue, // Cor do líquido
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-              ),
-            ),
-          ],
+
+                // Texto para mostrar o nível
+                Positioned(
+                  bottom: (_currentLevel / 100) * 400 + 10,
+                  child: Text(
+                    '${_currentLevel.toStringAsFixed(1)}%',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
