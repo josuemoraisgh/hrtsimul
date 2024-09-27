@@ -1,5 +1,5 @@
 //NAME:(BYTE_SIZE, TYPE, DEFAULT_VALUE | @FUNCTION)
-const List<String> instrumentType = ['TT301','LD301','FY301','DT301'];
+const List<String> instrumentType = ['TT301', 'LD301', 'FY301', 'DT301'];
 const Map<String, (int, String, dynamic)> hrtSettings = {
   'ramp_value': (4, 'FLOAT', '#ramp_value'),
   'ramdom_value': (4, 'FLOAT', '#ramdom_value'),
@@ -57,14 +57,14 @@ const Map<String, (int, String, dynamic)> hrtSettings = {
   'date': (3, 'DATE', '130879'), //19/08/2021
   'upper_range_value': (4, 'FLOAT', '44548000'), //850
   'lower_range_value': (4, 'FLOAT', 'C3480000'), //-200
-  'PROCESS_VARIABLE': (4, 'FLOAT', '@100*ramp_value'), //50
-  'percent_of_range': (
+  'PROCESS_VARIABLE': (
     4,
     'FLOAT',
-    '@100 * (PROCESS_VARIABLE - lower_range_value) / (upper_range_value - lower_range_value)'
-  ),
+    '@#ramp_value * (upper_range_value - lower_range_value) + lower_range_value'
+  ), //50
+  'percent_of_range': (4, 'FLOAT', '@100 * #ramp_value'),
   'loop_current_mode': (1, 'ENUM00', '00'),
-  'loop_current': (4, 'FLOAT', '@(percent_of_range*0.16)+4'),
+  'loop_current': (4, 'FLOAT', '@(percent_of_range * 0.16) + 4'),
   'write_protect': (1, 'ENUM00', '00'),
   'private_label_distributor': (1, 'ENUM00', '00'),
   'final_assembly_number': (3, 'UNSIGNED', '000000'),

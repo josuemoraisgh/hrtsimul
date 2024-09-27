@@ -24,7 +24,7 @@ class HrtTranslate {
     for (var key in hrtStorage.keys()) {
       var func = hrtStorage.getVariable(key) ?? "";
       if (func.substring(0, 1) == '@' || func.substring(0, 1) == '#') {
-        funcNotifier.value = {key: (func, hrtFunc2Double(func))};
+        funcNotifier.value.addAll({key: (func, hrtFunc2Double(func))});
       }
     }
     Timer.periodic(Duration(seconds: 1), (timer) {
@@ -41,7 +41,7 @@ class HrtTranslate {
     if (funcNotifier.value.containsKey(key))
       funcNotifier.value[key] = (func, funcNotifier.value[key]!.$2);
     else
-      funcNotifier.value[key] = (func, hrtFunc2Double(func));
+      funcNotifier.value.addAll({key: (func, hrtFunc2Double(func))});
   }
 
   bool deleteFuncNotifier(String key) {
@@ -57,25 +57,37 @@ class HrtTranslate {
   }
 
   double? hrtFunc2Double(String idVariable1) {
+    if (idVariable1 == 'PROCESS_VARIABLE') 
+    idVariable1 = idVariable1;
     final value = hrtStorage.getVariable(idVariable1);
     if (value == null) return 0;
     if (value.substring(0, 1) == '#') return hrtVirtalVar(value);
     if (value.substring(0, 1) == '@') {
       final iReg = RegExp(
-          r'[#_A-Z_a-z]+'); //RegExp(r'(#\b\w+\b)|(\b\w+\b)'); // Regex para capturar palavras
+          r'[#A-Z_a-z]+'); //RegExp(r'(#\b\w+\b)|(\b\w+\b)'); // Regex para capturar palavras
       final matches = iReg.allMatches(value);
       Map<String, double?> context = {};
       for (var e in matches) {
         if (e.group(0) != null) {
-          final variableHex = hrtStorage.getVariable(e.group(0)!);
+          final variableHex = e.group(0)!.substring(0, 1) == '#'
+              ? hrtVirtalVar(e.group(0)!).toString()
+              : hrtStorage.getVariable(e.group(0)!);
           if (variableHex == null) {
             return null;
           } else {
-            context[e.group(0)!] = hrtFunc2Double(variableHex);
+            context[e.group(0)!.replaceAll("#", "")] =
+                variableHex.substring(0, 1) == '@'
+                    ? funcNotifier.value[e.group(0)!]?.$2 ??
+                        hrtFunc2Double(e.group(0)!) ??
+                        0.0
+                    : e.group(0)!.substring(0, 1) == '#'
+                        ? double.parse(variableHex)
+                        : hrtFunc2Double(e.group(0)!) ?? 0.0;
           }
         }
       }
-      Expression expression = Expression.parse(value.substring(1));
+      Expression expression =
+          Expression.parse(value.substring(1).replaceAll("#", ""));
       return (evaluator.eval(expression, context) as double);
     }
     return hrtTypeHexTo(value, hrtSettings[idVariable1]!.$2);
