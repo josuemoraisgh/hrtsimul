@@ -19,7 +19,7 @@ class _CustomTableState extends State<CustomTable> {
   @override
   Widget build(BuildContext context) {
     // Converte keys() para uma lista
-    final hrtKeys = controller.hrtStorage.keys().toList();
+    final hrtKeys = controller.hrtTransmitter.keys().toList();
 
     return Expanded(
       child: Padding(
@@ -122,7 +122,7 @@ class _CustomTableState extends State<CustomTable> {
   }
 
   Widget _hrtType(String type, String name) {
-    final String func = controller.hrtStorage.getVariable(name) ?? "NULL";
+    final String func = controller.hrtTransmitter.getVariable(name) ?? "NULL";
     return switch (type) {
       (String s) when s.contains('BIT_ENUM') =>
         _tableTextField("", color: Colors.red),
@@ -139,7 +139,7 @@ class _CustomTableState extends State<CustomTable> {
             : _tableTextField(
                 controller.hrtTransmitter.getValue(func).toString(),
                 onChanged: (newValue) {
-                  controller.hrtStorage.setVariable(
+                  controller.hrtTransmitter.setVariable(
                       name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
                 },
               ),
@@ -148,7 +148,7 @@ class _CustomTableState extends State<CustomTable> {
   }
 
   Widget _hrtTypeHex2Enun(int enumId, String name) {
-    final String value = controller.hrtStorage.getVariable(name) ?? "NULL";
+    final String value = controller.hrtTransmitter.getVariable(name) ?? "NULL";
     return LayoutBuilder(builder: (context, constraints) {
       final size = constraints.maxWidth; // Obtém a largura atual
       return CustomDropdown(
@@ -157,7 +157,7 @@ class _CustomTableState extends State<CustomTable> {
           maxWidth: size - 24,
           onChanged: (id) {
             if (id != null) {
-              controller.hrtStorage.setVariable(name, id);
+              controller.hrtTransmitter.setVariable(name, id);
             }
           });
     });
