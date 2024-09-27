@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:expressions/expressions.dart';
 import 'package:flutter/material.dart';
 
-import 'hrt_settings.dart';
 import 'hrt_storage.dart';
 import 'hrt_type.dart';
 
@@ -14,15 +13,16 @@ class HrtTransmitter extends HrtStorage {
   final rampValueNotifier = ValueNotifier<double>(0.0);
   final randomValueNotifier = ValueNotifier<double>(0.0);
   var funcNotifier = ValueNotifier<Map<String, (String, double?)>>({});
+  ValueNotifier<double> inputValue;
 
-  HrtTransmitter(super.selectedInstrument) {}
+  HrtTransmitter(super.selectedInstrument, this.inputValue) {}
 
   Future<bool> init() async {
     await super.init();
     for (var key in super.keys()) {
       var func = super.getVariable(key) ?? "";
       if (func.substring(0, 1) == '@' || func.substring(0, 1) == '#') {
-        funcNotifier.value.addAll({key: (func, getValue(func))});
+        funcNotifier.value.addAll({key: (func, 0.0)});
       }
     }
     Timer.periodic(Duration(seconds: 1), (timer) {
@@ -31,7 +31,7 @@ class HrtTransmitter extends HrtStorage {
       randomValueNotifier.value = Random().nextDouble();
       for (var entrie in funcNotifier.value.entries) {
         funcNotifier.value[entrie.key] =
-            (entrie.value.$1, getValue(entrie.value.$1));
+            (entrie.value.$1, getTransmitterValue(entrie.value.$1));
       }
       updateValueFunc.value = !updateValueFunc.value;
     });
@@ -40,28 +40,28 @@ class HrtTransmitter extends HrtStorage {
 
   void updateFuncNotifier(String variableName, String func) {
     if (funcNotifier.value.containsKey(variableName))
-      funcNotifier.value[variableName] = (func, getValue(func));
+      funcNotifier.value[variableName] = (func, 0.0);
     else
-      funcNotifier.value.addAll({variableName: (func, getValue(func))});
+      funcNotifier.value.addAll({variableName: (func, 0.0)});
   }
 
   bool deleteFuncNotifier(String key) {
     return funcNotifier.value.remove(key) == null ? false : true;
   }
 
-  double? hrtVirtalVar(String func) {
-    return switch (func) {
-      '#ramp_value' => rampValueNotifier.value,
-      '#ramdom_value' => randomValueNotifier.value,
-      _ => 0.0, //Valor padrão, substitui o default
-    };
-  }
-
-  double? getValue(String func) {
-    return switch (func.substring(0, 1)) {
-      '#' => hrtVirtalVar(func),
-      '@' => hrtFunc2Double(func),
-      _ => hrtTypeHexTo(func, 'FLOAT'),
+  double? getTransmitterValue(String name, {bool isSubFunc = false}) {
+    final String? func = super.getVariable(name);
+    return switch (name) {
+      'input_value' => inputValue.value,
+      'ramp_value' => rampValueNotifier.value,
+      'ramdom_value' => randomValueNotifier.value,
+      _ => func == null
+          ? null
+          : switch (func.substring(0, 1)) {
+              '@' =>
+                isSubFunc ? funcNotifier.value[name]?.$2 : hrtFunc2Double(func),
+              _ => hrtTypeHexTo(func, 'FLOAT'),
+            },
     };
   }
 
@@ -72,26 +72,12 @@ class HrtTransmitter extends HrtStorage {
     Map<String, double?> context = {};
     for (var e in matches) {
       if (e.group(0) != null) {
-        final variableName = e.group(0)!;
-        final variableFunc = super.getVariable(variableName) ?? variableName;
-        context[variableName] = variableFunc.substring(0, 1) == '@'
-            ? funcNotifier.value[variableName]?.$2
-            : getValue(variableFunc);
+        // variableName != null
+        context[e.group(0)!] =
+            getTransmitterValue(e.group(0)!, isSubFunc: true);
       }
     }
     Expression expression = Expression.parse((func.substring(1)));
     return (evaluator.eval(expression, context) as double);
-  }
-
-  String? hrtFunc2Hex(String variableName) {
-    String? value = super.getVariable(variableName);
-    if (value == null) return null;
-    double? result = hrtFunc2Double(value);
-    if (result == null) return null;
-    return result
-        .toInt()
-        .toRadixString(16)
-        .toUpperCase()
-        .padLeft(hrtSettings[variableName]!.$1, '0');
   }
 }

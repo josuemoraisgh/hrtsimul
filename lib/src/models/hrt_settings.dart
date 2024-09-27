@@ -1,6 +1,7 @@
 //NAME:(BYTE_SIZE, TYPE, DEFAULT_VALUE | @FUNCTION)
 const List<String> instrumentType = ['TT301', 'LD301', 'FY301', 'DT301'];
 const Map<String, (int, String, dynamic)> hrtSettings = {
+  'input_value': (4, 'FLOAT', '#input_value'),
   'ramp_value': (4, 'FLOAT', '#ramp_value'),
   'ramdom_value': (4, 'FLOAT', '#ramdom_value'),
   'frame_type': (1, 'UNSIGNED', '06'),
@@ -60,9 +61,9 @@ const Map<String, (int, String, dynamic)> hrtSettings = {
   'PROCESS_VARIABLE': (
     4,
     'FLOAT',
-    '@ramp_value * (upper_range_value - lower_range_value) + lower_range_value'
+    '@input_value * (upper_range_value - lower_range_value) + lower_range_value'
   ), //50
-  'percent_of_range': (4, 'FLOAT', '@100 * ramp_value'),
+  'percent_of_range': (4, 'FLOAT', '@100 * input_value'),
   'loop_current_mode': (1, 'ENUM00', '00'),
   'loop_current': (4, 'FLOAT', '@(percent_of_range * 0.16) + 4'),
   'write_protect': (1, 'ENUM00', '00'),

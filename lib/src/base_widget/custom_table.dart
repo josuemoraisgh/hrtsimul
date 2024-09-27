@@ -128,21 +128,21 @@ class _CustomTableState extends State<CustomTable> {
         _tableTextField("", color: Colors.red),
       (String s) when s.contains('ENUM') =>
         _hrtTypeHex2Enun(int.parse(s.substring(s.length - 2)), name),
-      'SReal' ||
-      'FLOAT' =>
-        func.substring(0, 1) == '@' || func.substring(0, 1) == '#'
-            ? ValueListenableBuilder(
-                valueListenable: controller.hrtTransmitter.updateValueFunc,
-                builder: (___, __, _) => _tableTextField(
-                    controller.hrtTransmitter.getValue(func).toString()),
-              )
-            : _tableTextField(
-                controller.hrtTransmitter.getValue(func).toString(),
-                onChanged: (newValue) {
-                  controller.hrtTransmitter.setVariable(
-                      name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
-                },
-              ),
+      'SReal' || 'FLOAT' => func.substring(0, 1) == '@' ||
+              func.substring(0, 1) == '#'
+          ? ValueListenableBuilder(
+              valueListenable: controller.hrtTransmitter.updateValueFunc,
+              builder: (___, __, _) => _tableTextField(controller.hrtTransmitter
+                  .getTransmitterValue(name)
+                  .toString()),
+            )
+          : _tableTextField(
+              controller.hrtTransmitter.getTransmitterValue(name).toString(),
+              onChanged: (newValue) {
+                controller.hrtTransmitter.setVariable(
+                    name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
+              },
+            ),
       _ => _tableTextField(hrtTypeHexTo(func, type).toString()),
     };
   }

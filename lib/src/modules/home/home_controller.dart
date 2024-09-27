@@ -8,6 +8,14 @@ import '../../models/hrt_comm.dart';
 import '../../models/hrt_build.dart';
 import '../../models/hrt_frame.dart';
 import '../../models/hrt_settings.dart';
+import '../../models/simul_transfer_function.dart';
+
+// Exemplo de função de transferência de 2ª ordem
+// G(s) = (s + 1) / (s^2 + 2s + 1) -> 2ª ordem no denominador
+const List<double> numeratorTF = [1, 1]; // s + 1
+const List<double> denominatorTF = [1, 2, 1]; // s^2 + 2s + 1
+const ({int seconds, int milliseconds, int microseconds}) samplingTime =
+    (seconds: 0, milliseconds: 1, microseconds: 0);
 
 class HomeController extends Disposable {
   late final HrtComm hrtComm;
@@ -20,12 +28,21 @@ class HomeController extends Disposable {
   final frameType = ValueNotifier<String>("06");
   final selectedInstrument = ValueNotifier<String>(instrumentType[0]);
 
+  // Criar a função de transferência
+  final tankTransfFunction =
+      TransferFunction(numeratorTF, denominatorTF, samplingTime);
+  final plantInputValue = ValueNotifier<double>(100.0);
+  final plantOutputValue = ValueNotifier<double>(0.0);
+
   HomeController(this.hrtComm) {
-    hrtTransmitter = HrtTransmitter(selectedInstrument);
+    hrtTransmitter = HrtTransmitter(selectedInstrument, plantOutputValue);
   }
 
   Future<bool> init() async {
-    return hrtTransmitter.init();
+    await hrtTransmitter.init();
+    // Simular a resposta ao sinal
+    tankTransfFunction.start(plantInputValue, plantOutputValue);
+    return true;
   }
 
   void readHrtFrame(String data) {
@@ -40,7 +57,8 @@ class HomeController extends Disposable {
   }
 
   bool masterMode(String commandWrite) {
-    hrtTransmitter.setVariable('master_address', '80'); //Do device para o master
+    hrtTransmitter.setVariable(
+        'master_address', '80'); //Do device para o master
     hrtTransmitter.setVariable(
         'frame_type', frameType.value); //Do master para o device
     final hrtFrameRead = HrtFrame()
@@ -61,7 +79,8 @@ class HomeController extends Disposable {
 
   Future<bool> slaveMode(String frameRead) async {
     //quando slave deve ser 0
-    hrtTransmitter.setVariable('master_address', '80'); //Do device para o master
+    hrtTransmitter.setVariable(
+        'master_address', '80'); //Do device para o master
     hrtTransmitter.setVariable(
         'frame_type', frameType.value); //Do device para o master
     final hrtFrameRead = HrtFrame(frameRead);
@@ -73,5 +92,6 @@ class HomeController extends Disposable {
   @override
   void dispose() {
     hrtComm.disconnect();
+    tankTransfFunction.stop();
   }
 }
