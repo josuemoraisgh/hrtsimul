@@ -58,8 +58,9 @@ class HrtTransmitter extends HrtStorage {
       _ => func == null
           ? null
           : switch (func.substring(0, 1)) {
-              '@' =>
-                isSubFunc ? funcNotifier.value[name]?.$2 : hrtFunc2Double(func),
+              '@' => isSubFunc
+                  ? funcNotifier.value[name]?.$2 ?? 0.0
+                  : hrtFunc2Double(func),
               _ => hrtTypeHexTo(func, 'FLOAT'),
             },
     };
@@ -67,7 +68,7 @@ class HrtTransmitter extends HrtStorage {
 
   double? hrtFunc2Double(String func) {
     //RegExp(r'(#\b\w+\b)|(\b\w+\b)'); // Regex para capturar palavras
-    final iReg = RegExp(r'[#A-Z_a-z]+');
+    final iReg = RegExp(r'[A-Z_a-z]+');
     final matches = iReg.allMatches(func);
     Map<String, double?> context = {};
     for (var e in matches) {

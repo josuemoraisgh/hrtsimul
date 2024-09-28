@@ -12,11 +12,9 @@ import '../../models/simul_transfer_function.dart';
 
 // Exemplo de função de transferência de 2ª ordem
 // G(s) = (s + 1) / (s^2 + 2s + 1) -> 2ª ordem no denominador
-const List<double> numeratorTF = [1, 1]; // s + 1
-const List<double> denominatorTF = [1, 2, 1]; // s^2 + 2s + 1
-const ({int seconds, int milliseconds, int microseconds}) samplingTime =
-    (seconds: 0, milliseconds: 1, microseconds: 0);
-
+const List<double> numeratorTF = [1]; // 1
+const List<double> denominatorTF = [1, 1]; // 1s + 1
+const samplingTime = Duration(seconds: 1);
 class HomeController extends Disposable {
   late final HrtComm hrtComm;
   late final HrtTransmitter hrtTransmitter;
@@ -31,7 +29,7 @@ class HomeController extends Disposable {
   // Criar a função de transferência
   final tankTransfFunction =
       TransferFunction(numeratorTF, denominatorTF, samplingTime);
-  final plantInputValue = ValueNotifier<double>(100.0);
+  final plantInputValue = ValueNotifier<double>(1.0);
   final plantOutputValue = ValueNotifier<double>(0.0);
 
   HomeController(this.hrtComm) {
