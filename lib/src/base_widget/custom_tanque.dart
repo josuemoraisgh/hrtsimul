@@ -32,9 +32,9 @@ class _CustomTankState extends State<CustomTank> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: ValueListenableBuilder(
-          valueListenable: controller.hrtTransmitter.updateValueFunc,
-          builder: (___, __, _) {
-            final _currentLevel = controller.hrtTransmitter.funcNotifier.value[widget.varkey]?.$2 ?? 0.0;
+          valueListenable: controller
+              .hrtTransmitter.funcNotifier[widget.varkey]!.funcValueNotifier,
+          builder: (___, _currentLevel, _) {
             return Stack(
               alignment: Alignment.bottomCenter,
               children: [

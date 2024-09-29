@@ -26,7 +26,8 @@ class TransferFunction {
   void _discretize() {
     // Converter a função de transferência para espaço de estado
     var continuousModel = _transferFunctionToStateSpace(numerator, denominator);
-    double Ts = samplingTime.inMilliseconds / 1000.0; // Convertendo para segundos
+    double Ts =
+        samplingTime.inMilliseconds / 1000.0; // Convertendo para segundos
 
     // Obter a matriz A discreta como e^(A * Ts)
     List<List<double>> Ad = _matrixExponential(continuousModel['A']!, Ts);
@@ -37,9 +38,11 @@ class TransferFunction {
       I[i][i] = 1.0;
     }
 
-    List<List<double>> AdMinusI = _matrixAdd(Ad, _matrixScalarMultiply(I, -1.0));
+    List<List<double>> AdMinusI =
+        _matrixAdd(Ad, _matrixScalarMultiply(I, -1.0));
     List<List<double>> AInv = _matrixInverse1x1(continuousModel['A']!);
-    List<List<double>> Bd = _matrixMultiply(_matrixMultiply(AInv, AdMinusI), continuousModel['B']!);
+    List<List<double>> Bd =
+        _matrixMultiply(_matrixMultiply(AInv, AdMinusI), continuousModel['B']!);
 
     // Atribuindo valores às matrizes discretas
     discreteA = Ad;
@@ -54,9 +57,10 @@ class TransferFunction {
   }
 
   // Simulação do sistema com entrada personalizada
-  void start(ValueNotifier<double> input, ValueNotifier<double> output) {
+  void start(ValueNotifier<double> input, void Function(double) outputFunc) {
     Timer.periodic(samplingTime, (timer) {
       if (isStop.value) {
+        isStop.value = false;
         timer.cancel();
         return;
       }
@@ -83,8 +87,7 @@ class TransferFunction {
       _output += D[0][0] * input.value;
 
       // Atualizar o valor da saída
-      output.value = _output;
-      print('output: $_output');
+      outputFunc(_output);     
     });
   }
 
@@ -112,9 +115,7 @@ class TransferFunction {
     B[order - 1][0] = 1.0;
 
     // Matriz C (1 x ordem)
-    List<List<double>> C = [
-      List.filled(order, 0.0)
-    ];
+    List<List<double>> C = [List.filled(order, 0.0)];
     C[0][order - 1] = 1.0;
 
     // Matriz D (1 x 1)
@@ -141,7 +142,8 @@ class TransferFunction {
     // Aproximar e^(A * Ts) usando série de Taylor
     for (int k = 1; k < 20; k++) {
       factorial *= k;
-      List<List<double>> term = _matrixScalarMultiply(currentPower, pow(Ts, k) / factorial);
+      List<List<double>> term =
+          _matrixScalarMultiply(currentPower, pow(Ts, k) / factorial);
       result = _matrixAdd(result, term);
       currentPower = _matrixMultiply(currentPower, A);
     }
@@ -156,17 +158,20 @@ class TransferFunction {
         [1.0 / A[0][0]]
       ];
     } else {
-      throw ArgumentError("A matriz não é 1x1, não pode calcular a inversa usando esta função.");
+      throw ArgumentError(
+          "A matriz não é 1x1, não pode calcular a inversa usando esta função.");
     }
   }
 
   // Funções auxiliares para operações de matrizes
-  List<List<double>> _matrixMultiply(List<List<double>> A, List<List<double>> B) {
+  List<List<double>> _matrixMultiply(
+      List<List<double>> A, List<List<double>> B) {
     int rowsA = A.length;
     int colsA = A[0].length;
     int colsB = B[0].length;
 
-    List<List<double>> result = List.generate(rowsA, (i) => List.filled(colsB, 0.0));
+    List<List<double>> result =
+        List.generate(rowsA, (i) => List.filled(colsB, 0.0));
 
     for (int i = 0; i < rowsA; i++) {
       for (int j = 0; j < colsB; j++) {
@@ -183,7 +188,8 @@ class TransferFunction {
     int rows = A.length;
     int cols = A[0].length;
 
-    List<List<double>> result = List.generate(rows, (i) => List.filled(cols, 0.0));
+    List<List<double>> result =
+        List.generate(rows, (i) => List.filled(cols, 0.0));
 
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
@@ -194,11 +200,13 @@ class TransferFunction {
     return result;
   }
 
-  List<List<double>> _matrixScalarMultiply(List<List<double>> A, double scalar) {
+  List<List<double>> _matrixScalarMultiply(
+      List<List<double>> A, double scalar) {
     int rows = A.length;
     int cols = A[0].length;
 
-    List<List<double>> result = List.generate(rows, (i) => List.filled(cols, 0.0));
+    List<List<double>> result =
+        List.generate(rows, (i) => List.filled(cols, 0.0));
 
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
@@ -208,24 +216,4 @@ class TransferFunction {
 
     return result;
   }
-}
-
-void main() async {
-  // Definindo um sistema de transferência de primeira ordem
-  const List<double> numeratorTF = [1.0]; // Coeficientes do numerador
-  const List<double> denominatorTF = [0.0707, 1.0]; // Coeficientes do denominador
-  const samplingTime = Duration(milliseconds: 100); // Tempo de amostragem
-
-  final plantInputValue = ValueNotifier<double>(1.0); // Entrada inicial constante
-  final plantOutputValue = ValueNotifier<double>(0.0); // Saída inicial
-
-  // Criar o sistema de função de transferência
-  final transferFunction = TransferFunction(numeratorTF, denominatorTF, samplingTime);
-
-  // Iniciar a simulação
-  transferFunction.start(plantInputValue, plantOutputValue);
-
-  // Parar a simulação após 10 segundos
-  await Future.delayed(Duration(seconds: 10));
-  transferFunction.stop();
 }

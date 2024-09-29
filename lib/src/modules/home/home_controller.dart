@@ -11,10 +11,10 @@ import '../../models/hrt_settings.dart';
 import '../../models/simul_transfer_function.dart';
 
 // Exemplo de função de transferência de 2ª ordem
-// G(s) = (s + 1) / (s^2 + 2s + 1) -> 2ª ordem no denominador
-const List<double> numeratorTF = [1]; // 1
-const List<double> denominatorTF = [1, 1]; // 1s + 1
-const samplingTime = Duration(seconds: 1);
+const List<double> numeratorTF = [1.0]; // Coeficientes do numerador
+const List<double> denominatorTF = [0.07, 0.0000000001]; // Coef. do Denom.
+const samplingTime = Duration(seconds: 1); // Tempo de amostragem
+
 class HomeController extends Disposable {
   late final HrtComm hrtComm;
   late final HrtTransmitter hrtTransmitter;
@@ -32,15 +32,45 @@ class HomeController extends Disposable {
   final plantInputValue = ValueNotifier<double>(1.0);
   final plantOutputValue = ValueNotifier<double>(0.0);
 
+  // final StreamController<Map<String, (String, double?)>>
+  //     _hrtTransmitterController =
+  //     StreamController<Map<String, (String, double?)>>.broadcast();
+
+  // Stream<Map<String, (String, double?)>> get stream =>
+  //     _hrtTransmitterController.stream;
+  // void changedFuncs(Map<String, (String, double?)> notifier) {
+  //   _hrtTransmitterController.sink
+  //       .add(notifier); // Enviar o novo valor para o Stream
+  //} 
+
   HomeController(this.hrtComm) {
-    hrtTransmitter = HrtTransmitter(selectedInstrument, plantOutputValue);
+    hrtTransmitter = HrtTransmitter(selectedInstrument);
   }
 
   Future<bool> init() async {
     await hrtTransmitter.init();
-    // Simular a resposta ao sinal
-    tankTransfFunction.start(plantInputValue, plantOutputValue);
+    // stream.listen((notifier) {
+    //   print('input_value: ${notifier['input_value']!.$2}');
+    // });
     return true;
+  }
+
+  void hrtButtonConnect(String? e) {
+    if (e == 'CONNECTED') {
+      textController.text = "";
+      hrtComm.funcRead = readHrtFrame;
+      tankTransfFunction.start(plantInputValue,
+          (value) => hrtTransmitter.updateInputValue(value));
+      if (!hrtComm.connect()) {
+        Future.delayed(const Duration(milliseconds: 500)).then((_) {
+          connectNotifier.value = "DISCONNECTED";
+          tankTransfFunction.stop();
+        });
+      }
+    } else {
+      hrtComm.disconnect();
+      tankTransfFunction.stop();
+    }
   }
 
   void readHrtFrame(String data) {

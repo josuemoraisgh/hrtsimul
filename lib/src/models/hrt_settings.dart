@@ -1,9 +1,9 @@
 //NAME:(BYTE_SIZE, TYPE, DEFAULT_VALUE | @FUNCTION)
 const List<String> instrumentType = ['TT301', 'LD301', 'FY301', 'DT301'];
 const Map<String, (int, String, dynamic)> hrtSettings = {
-  'input_value': (4, 'FLOAT', '#input_value'),
-  'ramp_value': (4, 'FLOAT', '#ramp_value'),
-  'ramdom_value': (4, 'FLOAT', '#ramdom_value'),
+  'input_value': (4, 'FLOAT', '@input_value'),
+  'ramp_value': (4, 'FLOAT', '@ramp_value'),
+  'ramdom_value': (4, 'FLOAT', '@ramdom_value'),
   'frame_type': (1, 'UNSIGNED', '06'),
   'address_type': (1, 'UNSIGNED', '00'),
   'error_code': (2, 'ENUM00', '0040'),

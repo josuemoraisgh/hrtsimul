@@ -22,7 +22,7 @@ class HrtStorage {
   }
 
   Iterable<dynamic> keys() {
-    return box?.keys ?? hrtSettings.keys;
+    return hrtSettings.keys;
   }
 
   String? getVariable(String idVariable) {

@@ -232,30 +232,17 @@ class _HomePageState extends State<HomePage> {
   // Widget para conectar e desconectar
   Widget _buildConnectButton() {
     return CustomButton(
-      title: "CONNECTED",
-      titleOff: "DISCONNECTED",
-      initialValue: "DISCONNECTED",
-      groupValue: controller.connectNotifier,
-      colorOn: Colors.red,
-      colorOff: Colors.green,
-      onChanged: (e) {
-        if (e == 'CONNECTED') {
-          controller.textController.text = "";
-          controller.hrtComm.funcRead = controller.readHrtFrame;
-          if (!controller.hrtComm.connect()) {
-            Future.delayed(const Duration(milliseconds: 500)).then((_) {
-              setState(() {
-                controller.connectNotifier.value = "DISCONNECTED";
-              });
-            });
-          }
-        } else {
+        title: "CONNECTED",
+        titleOff: "DISCONNECTED",
+        initialValue: "DISCONNECTED",
+        groupValue: controller.connectNotifier,
+        colorOn: Colors.red,
+        colorOff: Colors.green,
+        onChanged: (e) {
           setState(() {
-            controller.hrtComm.disconnect();
+            controller.hrtButtonConnect(e);
           });
-        }
-      },
-    );
+        });
   }
 
   Widget _buildCommandField() {
