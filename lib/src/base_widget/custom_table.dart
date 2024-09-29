@@ -131,7 +131,7 @@ class _CustomTableState extends State<CustomTable> {
       'SReal' || 'FLOAT' => func.substring(0, 1) == '@'
           ? ValueListenableBuilder(
               valueListenable: controller
-                  .hrtTransmitter.funcNotifier[name]!.funcValueNotifier,
+                  .hrtTransmitter.funcNotifier.value[name]!.funcValueNotifier,
               builder: (___, value, _) => _tableTextField(value.toString()),
             )
           : _tableTextField(

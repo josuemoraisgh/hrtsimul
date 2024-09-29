@@ -2,13 +2,14 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:expressions/expressions.dart';
+import 'package:flutter/material.dart';
 import 'package:hrtsimul/src/base_widget/transmitter_model.dart';
 import 'hrt_storage.dart';
 import 'hrt_type.dart';
 
 class HrtTransmitter extends HrtStorage {
   final evaluator = const ExpressionEvaluator();
-  var funcNotifier = <String, TransmitterModel>{};
+  final funcNotifier = ValueNotifier<Map<String, TransmitterModel>>({});
 
   double inputValue = 0.0;
   double rampValue = 0.0;
@@ -17,36 +18,34 @@ class HrtTransmitter extends HrtStorage {
   HrtTransmitter(super.selectedInstrument) {}
 
   Future<bool> init() async {
-    return super.init();
+    var resp = await super.init();
+    for (var variableName in keys()) {
+      var func = getVariable(variableName) ?? "";
+      if (func.substring(0, 1) == '@') {
+        funcNotifier.value.addAll({variableName: TransmitterModel(this, func)});
+      }
+    }
+    return resp;
   }
 
   void updateInputValue(double inpValue) {
     inputValue = inpValue;
     rampValue = rampValue > 1.0 ? 0.0 : rampValue + 0.01;
     randomValue = Random().nextDouble();
-    if (funcNotifier.isEmpty) {
-      for (var variableName in keys()) {
-        var func = getVariable(variableName) ?? "";
-        if (func.substring(0, 1) == '@') {
-          funcNotifier.addAll({variableName: TransmitterModel(this, func)});
-        }
-      }
-    } else {
-      for (var entrie in funcNotifier.entries) {
-        funcNotifier[entrie.key]?.updateFunc();
-      }
+    for (var entrie in funcNotifier.value.entries) {
+      funcNotifier.value[entrie.key]?.updateFunc();
     }
   }
 
   void insertFuncNotifier(String variableName, String func) {
-    if (funcNotifier.containsKey(variableName))
-      funcNotifier[variableName]?.updateFunc();
+    if (funcNotifier.value.containsKey(variableName))
+      funcNotifier.value[variableName]?.updateFunc();
     else
-      funcNotifier.addAll({variableName: TransmitterModel(this, func)});
+      funcNotifier.value.addAll({variableName: TransmitterModel(this, func)});
   }
 
   bool deleteFuncNotifier(String key) {
-    return funcNotifier.remove(key) == null ? false : true;
+    return funcNotifier.value.remove(key) == null ? false : true;
   }
 
   double? getTransmitterValue(String name, {bool isSubFunc = false}) {
@@ -59,7 +58,7 @@ class HrtTransmitter extends HrtStorage {
           ? null
           : switch (func.substring(0, 1)) {
               '@' => isSubFunc
-                  ? funcNotifier[name]?.Value ?? 0.0
+                  ? funcNotifier.value[name]?.Value ?? 0.0
                   : hrtFunc2Double(func),
               _ => hrtTypeHexTo(func, 'FLOAT'),
             },

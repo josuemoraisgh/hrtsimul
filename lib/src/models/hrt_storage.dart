@@ -11,9 +11,7 @@ class HrtStorage {
   final ValueNotifier<String> selectedInstrument;
   Box<dynamic>? box;
 
-  HrtStorage(this.selectedInstrument) {
-    init();
-  }
+  HrtStorage(this.selectedInstrument);
 
   Future<bool> init() async {
     if (!Hive.isBoxOpen('HRTSTORAGE'))

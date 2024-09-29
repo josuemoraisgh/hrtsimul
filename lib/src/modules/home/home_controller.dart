@@ -48,11 +48,7 @@ class HomeController extends Disposable {
   }
 
   Future<bool> init() async {
-    await hrtTransmitter.init();
-    // stream.listen((notifier) {
-    //   print('input_value: ${notifier['input_value']!.$2}');
-    // });
-    return true;
+    return await hrtTransmitter.init();
   }
 
   void hrtButtonConnect(String? e) {

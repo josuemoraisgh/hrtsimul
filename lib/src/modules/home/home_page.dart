@@ -28,30 +28,26 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: FutureBuilder<bool>(
         future: controller.init(),
-        initialData: false,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.data == false) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildTitle(),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: Row(children: [
-                    CustomTank('percent_of_range'),
-                    const CustomTable(),
-                  ]),
-                ),
-                const SizedBox(height: 10),
-                _buildLogContainer(),
-                const SizedBox(height: 10),
-                _buildControls(),
-              ],
-            );
-          }
-        },
+        builder: (BuildContext context, AsyncSnapshot snapshot) =>
+            !snapshot.hasData
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildTitle(),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: Row(children: [
+                          CustomTank('percent_of_range'),
+                          const CustomTable(),
+                        ]),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildLogContainer(),
+                      const SizedBox(height: 10),
+                      _buildControls(),
+                    ],
+                  ),
       ),
     );
   }

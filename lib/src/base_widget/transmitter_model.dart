@@ -4,7 +4,7 @@ import '../models/hrt_transmitter.dart';
 
 class TransmitterModel {
   final HrtTransmitter hrtTransmitter;
-  final String func;
+  String func;
   final funcValueNotifier = ValueNotifier<double>(0.0);
 
   TransmitterModel(this.hrtTransmitter, this.func) {
