@@ -26,28 +26,22 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<bool>(
-        future: controller.init(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) =>
-            !snapshot.hasData
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildTitle(),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: Row(children: [
-                          CustomTank('percent_of_range'),
-                          const CustomTable(),
-                        ]),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildLogContainer(),
-                      const SizedBox(height: 10),
-                      _buildControls(),
-                    ],
-                  ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildTitle(),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Row(children: [
+              CustomTank('percent_of_range'),
+              const CustomTable(),
+            ]),
+          ),
+          const SizedBox(height: 10),
+          _buildLogContainer(),
+          const SizedBox(height: 10),
+          _buildControls(),
+        ],
       ),
     );
   }

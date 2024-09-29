@@ -3,30 +3,37 @@ import 'dart:math';
 
 import 'package:expressions/expressions.dart';
 import 'package:flutter/material.dart';
-import 'package:hrtsimul/src/base_widget/transmitter_model.dart';
+import 'package:hrtsimul/src/base_widget/hrt_variable_model.dart';
 import 'hrt_storage.dart';
 import 'hrt_type.dart';
 
 class HrtTransmitter extends HrtStorage {
   final evaluator = const ExpressionEvaluator();
-  final funcNotifier = ValueNotifier<Map<String, TransmitterModel>>({});
+  final funcNotifier = ValueNotifier<Map<String, HrtVariableModel>>({});
 
   double inputValue = 0.0;
   double rampValue = 0.0;
   double randomValue = 0.0;
 
-  HrtTransmitter(super.selectedInstrument) {}
-
-  Future<bool> init() async {
-    var resp = await super.init();
+  HrtTransmitter(super.selectedInstrument) {
     for (var variableName in keys()) {
       var func = getVariable(variableName) ?? "";
       if (func.substring(0, 1) == '@') {
-        funcNotifier.value.addAll({variableName: TransmitterModel(this, func)});
+        funcNotifier.value.addAll({variableName: HrtVariableModel(this, func)});
       }
     }
-    return resp;
   }
+
+  // Future<bool> init() async {
+  //   var resp = await super.init();
+  //   for (var variableName in keys()) {
+  //     var func = getVariable(variableName) ?? "";
+  //     if (func.substring(0, 1) == '@') {
+  //       funcNotifier.value.addAll({variableName: HrtVariableModel(this, func)});
+  //     }
+  //   }
+  //   return resp;
+  // }
 
   void updateInputValue(double inpValue) {
     inputValue = inpValue;
@@ -41,7 +48,7 @@ class HrtTransmitter extends HrtStorage {
     if (funcNotifier.value.containsKey(variableName))
       funcNotifier.value[variableName]?.updateFunc();
     else
-      funcNotifier.value.addAll({variableName: TransmitterModel(this, func)});
+      funcNotifier.value.addAll({variableName: HrtVariableModel(this, func)});
   }
 
   bool deleteFuncNotifier(String key) {

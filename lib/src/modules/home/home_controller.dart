@@ -47,9 +47,9 @@ class HomeController extends Disposable {
     hrtTransmitter = HrtTransmitter(selectedInstrument);
   }
 
-  Future<bool> init() async {
-    return await hrtTransmitter.init();
-  }
+  // Future<bool> init() async {
+  //   return hrtTransmitter.init();
+  // }
 
   void hrtButtonConnect(String? e) {
     if (e == 'CONNECTED') {
