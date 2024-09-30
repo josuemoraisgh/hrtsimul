@@ -31,10 +31,10 @@ class _CustomTankState extends State<CustomTank> {
           border: Border.all(color: Colors.black, width: 2),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: ValueListenableBuilder(
-          valueListenable:
-              controller.hrtTransmitter.funcNotifier[widget.varkey]!,
-          builder: (context, _currentLevel, child) {
+        child: AnimatedBuilder(
+              animation: controller.hrtTransmitter.funcNotifier.value[widget.varkey]!,
+          builder: (context, child) {
+            var _currentLevel = controller.hrtTransmitter.funcNotifier.value[widget.varkey]!.funcValue;
             return Stack(
               alignment: Alignment.bottomCenter,
               children: [

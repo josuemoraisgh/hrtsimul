@@ -6,19 +6,22 @@ import 'package:hrtsimul/src/base_widget/hrt_variable_model.dart';
 import 'hrt_storage.dart';
 import 'hrt_type.dart';
 
-class HrtTransmitter extends HrtStorage {
+class HrtTransmitter {
+  final hrtStorage = HrtStorage();
   final evaluator = const ExpressionEvaluator();
-  final funcNotifier = <String, HrtVariableModel>{};
+  final funcNotifier = ValueNotifier<Map<String, HrtVariableModel>>({});
+  final ValueNotifier<String> selectedInstrument ;
 
   final ValueNotifier<double> inputValue;
   double rampValue = 0.0;
   double randomValue = 0.0;
 
-  HrtTransmitter(super.selectedInstrument,this.inputValue) {
-    for (var variableName in super.keys()) {
-      var func = super.getVariable(variableName) ?? "";
+  HrtTransmitter(this.selectedInstrument, this.inputValue) {
+    hrtStorage.setSelectedInstrument(selectedInstrument);
+    for (var variableName in keys()) {
+      var func = getVariable(variableName) ?? "";
       if (func.substring(0, 1) == '@') {
-        funcNotifier.addAll({variableName: HrtVariableModel(this, func)});
+        funcNotifier.value.addAll({variableName: HrtVariableModel(this,variableName, func)});
       }
     }
     Timer.periodic(Duration(seconds: 1), (timer) {
@@ -29,36 +32,34 @@ class HrtTransmitter extends HrtStorage {
   void updateInputValue() {
     rampValue = rampValue > 1.0 ? 0.0 : rampValue + 0.01;
     randomValue = Random().nextDouble();
-    for (var entrie in funcNotifier.entries) {
-      funcNotifier[entrie.key]!.updateFunc();
+    for (var entrie in funcNotifier.value.entries) {
+      funcNotifier.value[entrie.key]!.updateFunc();
     }
   }
 
   void insertFuncNotifier(String variableName, String func) {
-    if (funcNotifier.containsKey(variableName))
-      funcNotifier[variableName]!.updateFunc();
+    if (funcNotifier.value.containsKey(variableName))
+      funcNotifier.value[variableName]!.updateFunc();
     else
-      funcNotifier.addAll({variableName: HrtVariableModel(this, func)});
+      funcNotifier.value.addAll({variableName: HrtVariableModel(this,variableName, func)});
   }
 
   bool deleteFuncNotifier(String key) {
-    return funcNotifier.remove(key) == null ? false : true;
+    return funcNotifier.value.remove(key) == null ? false : true;
   }
 
-  double? getTransmitterValue(String name, {bool isSubFunc = false}) {
-    final String? func = super.getVariable(name);
+  double? getTransmitterValue(String name, String func,
+      {bool isSubFunc = false}) {
     final resp = switch (name) {
       '@input_value' || 'input_value' => inputValue.value,
       '@ramp_value' || 'ramp_value' => rampValue,
       '@ramdom_value' || 'ramdom_value' => randomValue,
-      _ => func == null
-          ? null
-          : switch (func.substring(0, 1)) {
-              '@' => isSubFunc
-                  ? funcNotifier[name]?.funcValue ?? 0.0
-                  : hrtFunc2Double(func),
-              _ => hrtTypeHexTo(func, 'FLOAT'),
-            },
+      _ => switch (func.substring(0, 1)) {
+          '@' => isSubFunc
+              ? funcNotifier.value[name]?.funcValue ?? 0.0
+              : hrtFunc2Double(func),
+          _ => hrtTypeHexTo(func, 'FLOAT'),
+        },
     };
     return resp;
   }
@@ -71,19 +72,24 @@ class HrtTransmitter extends HrtStorage {
     for (var e in matches) {
       if (e.group(0) != null) {
         // variableName != null
-        context[e.group(0)!] =
-            getTransmitterValue(e.group(0)!, isSubFunc: true);
+        context[e.group(0)!] = getTransmitterValue(
+            e.group(0)!, getVariable(e.group(0)!)!,
+            isSubFunc: true);
       }
     }
     Expression expression = Expression.parse((func.substring(1)));
     return (evaluator.eval(expression, context) as double);
   }
 
+  Iterable<dynamic> keys() {
+    return hrtStorage.keys(); 
+  }
+
   String? getVariable(String idVariable) {
-    return super.getVariable(idVariable);
+    return hrtStorage.getVariable(idVariable);
   }
 
   void setVariable(String idVariable, String value) {
-    super.setVariable(idVariable, value);
+    hrtStorage.setVariable(idVariable, value);
   }
 }

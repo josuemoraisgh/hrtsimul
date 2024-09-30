@@ -8,9 +8,13 @@ class HrtStorage {
   final evaluator = const ExpressionEvaluator();
   final rampLevelNotifier = ValueNotifier<double>(0.0);
   final randomLevelNotifier = ValueNotifier<double>(0.0);
-  final ValueNotifier<String> selectedInstrument;
+  ValueNotifier<String>? selectedInstrument;
 
-  HrtStorage(this.selectedInstrument);
+  HrtStorage({this.selectedInstrument});
+
+  void setSelectedInstrument(ValueNotifier<String>? _selectedInstrument){
+    selectedInstrument = _selectedInstrument;
+  }
 
   // Future<bool> init() async {
   //   if (!Hive.isBoxOpen('HRTSTORAGE'))
@@ -24,7 +28,7 @@ class HrtStorage {
 
   String? getVariable(String idVariable) {
     dynamic resp = boxHrtStorage?.get(idVariable) ?? hrtSettings[idVariable]?.$3;
-    return resp is Map ? resp[selectedInstrument.value] : resp;
+    return resp is Map ? resp[selectedInstrument?.value ?? instrumentType.first] : resp;
   }
 
   void setVariable(String idVariable, String value) {
@@ -33,7 +37,7 @@ class HrtStorage {
       if (resp is Map) {
         boxHrtStorage!.put(
             idVariable,
-            (resp.map((key, val) => resp[selectedInstrument.value] == key
+            (resp.map((key, val) => resp[selectedInstrument?.value ?? instrumentType.first] == key
                 ? MapEntry<String, String>(key, value)
                 : MapEntry<String, String>(key, val))) as dynamic);
       } else {

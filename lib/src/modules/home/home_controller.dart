@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -19,7 +20,6 @@ class HomeController extends Disposable {
   late final HrtComm hrtComm;
   late final HrtTransmitter hrtTransmitter;
   final connectNotifier = ValueNotifier<String>("");
-  final ftOutputValue = ValueNotifier<double>(0.0);  
   final sendNotifier = ValueNotifier<String>("");
   final hrtFrameWrite = HrtFrame();
   final textController = TextEditingController();
@@ -33,31 +33,25 @@ class HomeController extends Disposable {
   final plantInputValue = ValueNotifier<double>(1.0);
   final plantOutputValue = ValueNotifier<double>(0.0);
 
-  // final StreamController<Map<String, (String, double?)>>
-  //     _hrtTransmitterController =
-  //     StreamController<Map<String, (String, double?)>>.broadcast();
-
-  // Stream<Map<String, (String, double?)>> get stream =>
-  //     _hrtTransmitterController.stream;
-  // void changedFuncs(Map<String, (String, double?)> notifier) {
-  //   _hrtTransmitterController.sink
-  //       .add(notifier); // Enviar o novo valor para o Stream
-  //}
-
   HomeController(this.hrtComm) {
-    hrtTransmitter = HrtTransmitter(selectedInstrument,ftOutputValue);
+    hrtTransmitter = HrtTransmitter(selectedInstrument, plantOutputValue);
   }
 
-  // Future<bool> init() async {
-  //   return hrtTransmitter.init();
-  // }
-
-  void hrtButtonConnect(String? e) {
+  Future<void> hrtButtonConnect(String? e) async {
     if (e == 'CONNECTED') {
       textController.text = "";
       hrtComm.funcRead = readHrtFrame;
-      tankTransfFunction.start(
-          plantInputValue, ftOutputValue);
+      await tankTransfFunction.createIsolate();
+      tankTransfFunction.setInputValue(plantInputValue.value);
+      plantInputValue.addListener(() {
+        tankTransfFunction.setInputValue(plantInputValue.value);
+      });
+      tankTransfFunction.receiveStream.listen((message) {
+        if (message is double) {
+          plantOutputValue.value = message;
+        }
+      });
+      tankTransfFunction.start();
       if (!hrtComm.connect()) {
         Future.delayed(const Duration(milliseconds: 500)).then((_) {
           connectNotifier.value = "DISCONNECTED";
@@ -117,6 +111,6 @@ class HomeController extends Disposable {
   @override
   void dispose() {
     hrtComm.disconnect();
-    tankTransfFunction.stop();
+    tankTransfFunction.close();
   }
 }

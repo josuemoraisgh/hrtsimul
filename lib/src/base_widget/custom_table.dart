@@ -129,12 +129,12 @@ class _CustomTableState extends State<CustomTable> {
       (String s) when s.contains('ENUM') =>
         _hrtTypeHex2Enun(int.parse(s.substring(s.length - 2)), name),
       'SReal' || 'FLOAT' => func.substring(0, 1) == '@'
-          ? ValueListenableBuilder(
-              valueListenable: controller.hrtTransmitter.funcNotifier[name]!,
-              builder: (context, funcValue, child) =>
-                  _tableTextField(funcValue.toString()))
+          ? AnimatedBuilder(
+              animation: controller.hrtTransmitter.funcNotifier.value[name]!,
+              builder: (context, child) =>
+                  _tableTextField(controller.hrtTransmitter.funcNotifier.value[name]!.funcValue.toString()))
           : _tableTextField(
-              controller.hrtTransmitter.getTransmitterValue(name).toString(),
+              controller.hrtTransmitter.getTransmitterValue(name, func).toString(),
               onChanged: (newValue) {
                 controller.hrtTransmitter.setVariable(
                     name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
