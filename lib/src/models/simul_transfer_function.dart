@@ -6,11 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 class TransferFunction extends Disposable {
-  final _receivePort = ReceivePort();
-  late Isolate _isolate;
-  late Stream receiveStream;
+  ReceivePort? _receivePort;
+  Isolate? _isolate;
+  Stream? receiveStream;
   SendPort? _sendPort;
-
 
   final List<double> numerator; // Coeficientes do numerador
   final List<double> denominator; // Coeficientes do denominador
@@ -26,7 +25,6 @@ class TransferFunction extends Disposable {
   TransferFunction(this.numerator, this.denominator, this.samplingTime)
       : order = denominator.length - 1,
         state = List.filled(denominator.length - 1, 0.0) {
-    receiveStream = _receivePort.asBroadcastStream();
     _discretize();
   }
 
@@ -56,30 +54,29 @@ class TransferFunction extends Disposable {
     D = continuousModel['D']!;
   }
 
-  start() {
-    _sendPort?.send({'mode': 'start'});
-  }
+  start() => _sendPort?.send({'mode': 'start'});
 
-  stop() {
-    _sendPort?.send({'mode': 'stop'});
-  }
+  stop() => _sendPort?.send({'mode': 'stop'});
 
   close() {
     _sendPort?.send({'mode': 'close'});
+    _receivePort?.close(); // Fecha o ReceivePort ao encerrar o widget
+    _isolate?.kill(priority: Isolate.immediate);
   }
 
-  setInputValue(double input) {
-    _sendPort?.send({'mode': 'input', 'input': input});
-  }
+  setInputValue(double input) =>
+      _sendPort?.send({'mode': 'input', 'input': input});
 
   // Função para iniciar a simulação usando uma Isolate
-  Future<void> createIsolate() async {
+  Future<void> createIsolate(ValueNotifier<double> plantOutputValue) async {
+    _receivePort = ReceivePort();
+    receiveStream = _receivePort!.asBroadcastStream();
     // Iniciar a Isolate
-    _isolate = await Isolate.spawn(_simulationIsolate, _receivePort.sendPort);
+    _isolate = await Isolate.spawn(_simulationIsolate, _receivePort!.sendPort);
     // Completer para obter o SendPort da Isolate
     Completer<SendPort> completer = Completer();
     // Ouve as mensagens da Isolate
-    _receivePort.listen((message) {
+    _receivePort!.listen((message) {
       if (message is SendPort && !completer.isCompleted) {
         _sendPort = message; // Recebe o SendPort da Isolate
         completer.complete(_sendPort);
@@ -93,12 +90,13 @@ class TransferFunction extends Disposable {
           'state': state,
           'samplingTime': samplingTime.inMilliseconds,
         });
+      } else if (message is Map) {
+        state = message['state'];
+        plantOutputValue.value = message['output'];
       }
     });
-
     // Aguarda até obter o SendPort da Isolate
     await completer.future;
-    // Retorna o ReceivePort para o usuário receber os outputs
   }
 
   // Função executada dentro da Isolate
@@ -295,7 +293,7 @@ class TransferFunction extends Disposable {
 
   @override
   void dispose() {
-    _receivePort.close(); // Fecha o ReceivePort ao encerrar o widget
-    _isolate.kill(priority: Isolate.immediate);
+    _receivePort?.close(); // Fecha o ReceivePort ao encerrar o widget
+    _isolate?.kill(priority: Isolate.immediate);
   }
 }

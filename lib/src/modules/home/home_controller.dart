@@ -41,15 +41,10 @@ class HomeController extends Disposable {
     if (e == 'CONNECTED') {
       textController.text = "";
       hrtComm.funcRead = readHrtFrame;
-      await tankTransfFunction.createIsolate();
+      await tankTransfFunction.createIsolate(plantOutputValue);
       tankTransfFunction.setInputValue(plantInputValue.value);
       plantInputValue.addListener(() {
         tankTransfFunction.setInputValue(plantInputValue.value);
-      });
-      tankTransfFunction.receiveStream.listen((message) {
-        if (message is double) {
-          plantOutputValue.value = message;
-        }
       });
       tankTransfFunction.start();
       if (!hrtComm.connect()) {

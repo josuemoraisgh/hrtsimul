@@ -32,9 +32,9 @@ class _CustomTankState extends State<CustomTank> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: AnimatedBuilder(
-              animation: controller.hrtTransmitter.funcNotifier.value[widget.varkey]!,
+              animation: controller.hrtTransmitter,
           builder: (context, child) {
-            var _currentLevel = controller.hrtTransmitter.funcNotifier.value[widget.varkey]!.funcValue;
+            var _currentLevel = controller.hrtTransmitter.funcValues[widget.varkey]!.funcValue;
             return Stack(
               alignment: Alignment.bottomCenter,
               children: [

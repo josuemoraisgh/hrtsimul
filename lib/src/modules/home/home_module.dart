@@ -8,7 +8,7 @@ class HomeModule extends Module {
   @override
   void binds(Injector i) {
     i.addInstance<HrtComm>(HrtComm());    
-    i.add<HomeController>(HomeController.new);         
+    i.addInstance<HomeController>(HomeController(i<HrtComm>()));         
   }
 
   @override

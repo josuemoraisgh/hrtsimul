@@ -130,9 +130,9 @@ class _CustomTableState extends State<CustomTable> {
         _hrtTypeHex2Enun(int.parse(s.substring(s.length - 2)), name),
       'SReal' || 'FLOAT' => func.substring(0, 1) == '@'
           ? AnimatedBuilder(
-              animation: controller.hrtTransmitter.funcNotifier.value[name]!,
+              animation: controller.hrtTransmitter,
               builder: (context, child) =>
-                  _tableTextField(controller.hrtTransmitter.funcNotifier.value[name]!.funcValue.toString()))
+                  _tableTextField(controller.hrtTransmitter.funcValues[name]!.funcValue.toString()))
           : _tableTextField(
               controller.hrtTransmitter.getTransmitterValue(name, func).toString(),
               onChanged: (newValue) {

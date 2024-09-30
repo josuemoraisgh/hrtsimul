@@ -6,13 +6,13 @@ import 'package:hrtsimul/src/base_widget/hrt_variable_model.dart';
 import 'hrt_storage.dart';
 import 'hrt_type.dart';
 
-class HrtTransmitter {
+class HrtTransmitter extends ChangeNotifier{
   final hrtStorage = HrtStorage();
   final evaluator = const ExpressionEvaluator();
-  final funcNotifier = ValueNotifier<Map<String, HrtVariableModel>>({});
+  final funcValues = <String, HrtVariableModel>{};
   final ValueNotifier<String> selectedInstrument ;
-
   final ValueNotifier<double> inputValue;
+
   double rampValue = 0.0;
   double randomValue = 0.0;
 
@@ -21,7 +21,7 @@ class HrtTransmitter {
     for (var variableName in keys()) {
       var func = getVariable(variableName) ?? "";
       if (func.substring(0, 1) == '@') {
-        funcNotifier.value.addAll({variableName: HrtVariableModel(this,variableName, func)});
+        funcValues.addAll({variableName: HrtVariableModel(this,variableName, func)});
       }
     }
     Timer.periodic(Duration(seconds: 1), (timer) {
@@ -32,20 +32,21 @@ class HrtTransmitter {
   void updateInputValue() {
     rampValue = rampValue > 1.0 ? 0.0 : rampValue + 0.01;
     randomValue = Random().nextDouble();
-    for (var entrie in funcNotifier.value.entries) {
-      funcNotifier.value[entrie.key]!.updateFunc();
+    for (var entrie in funcValues.entries) {
+      funcValues[entrie.key]!.updateFunc();
     }
+    notifyListeners();
   }
 
   void insertFuncNotifier(String variableName, String func) {
-    if (funcNotifier.value.containsKey(variableName))
-      funcNotifier.value[variableName]!.updateFunc();
+    if (funcValues.containsKey(variableName))
+      funcValues[variableName]!.updateFunc();
     else
-      funcNotifier.value.addAll({variableName: HrtVariableModel(this,variableName, func)});
+      funcValues.addAll({variableName: HrtVariableModel(this,variableName, func)});
   }
 
   bool deleteFuncNotifier(String key) {
-    return funcNotifier.value.remove(key) == null ? false : true;
+    return funcValues.remove(key) == null ? false : true;
   }
 
   double? getTransmitterValue(String name, String func,
@@ -56,7 +57,7 @@ class HrtTransmitter {
       '@ramdom_value' || 'ramdom_value' => randomValue,
       _ => switch (func.substring(0, 1)) {
           '@' => isSubFunc
-              ? funcNotifier.value[name]?.funcValue ?? 0.0
+              ? funcValues[name]?.funcValue ?? 0.0
               : hrtFunc2Double(func),
           _ => hrtTypeHexTo(func, 'FLOAT'),
         },
