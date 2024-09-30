@@ -1,36 +1,37 @@
+import 'package:hrtsimul/src/models/hrt_transmitter.dart';
+
 import '../models/hrt_frame.dart';
-import '../models/hrt_storage.dart';
 import '../extension/hex_extension_string.dart';
 
 class HrtBuild {
   final _hrtFrameWrite = HrtFrame();
 
-  HrtBuild(HrtStorage hrtStorage, HrtFrame hrtFrameRead) {
+  HrtBuild(HrtTransmitter hrtTransmitter, HrtFrame hrtFrameRead) {
     _hrtFrameWrite.command = hrtFrameRead.command;
     _hrtFrameWrite.addressType = hrtFrameRead.addressType;
-    hrtStorage.setVariable(
+    hrtTransmitter.setVariable(
         'address_type', hrtFrameRead.addressType == false ? '00' : '80');
-    _hrtFrameWrite.frameType = hrtStorage.getVariable('frame_type')!;
+    _hrtFrameWrite.frameType = hrtTransmitter.getVariable('frame_type')!;
     _hrtFrameWrite.masterAddress =
-        hrtStorage.getVariable('master_address') == "00" ? false : true;
+        hrtTransmitter.getVariable('master_address') == "00" ? false : true;
     if (_hrtFrameWrite.addressType) {
-      _hrtFrameWrite.manufacterId = hrtStorage.getVariable('manufacturer_id')!;
-      _hrtFrameWrite.deviceType = hrtStorage.getVariable('device_type')!;
-      _hrtFrameWrite.deviceId = hrtStorage.getVariable('device_id')!;
+      _hrtFrameWrite.manufacterId = hrtTransmitter.getVariable('manufacturer_id')!;
+      _hrtFrameWrite.deviceType = hrtTransmitter.getVariable('device_type')!;
+      _hrtFrameWrite.deviceId = hrtTransmitter.getVariable('device_id')!;
     } else {
       _hrtFrameWrite.pollingAddress =
-          hrtStorage.getVariable('polling_address')!;
+          hrtTransmitter.getVariable('polling_address')!;
     }
     if (_hrtFrameWrite.frameType == "02") {
-      _request(hrtStorage, hrtFrameRead);
+      _request(hrtTransmitter, hrtFrameRead);
     } else {
-      _response(hrtStorage, hrtFrameRead);
+      _response(hrtTransmitter, hrtFrameRead);
     }
   }
 
   String get frame => _hrtFrameWrite.frame;
 
-  void _request(final HrtStorage hrtStorage, final HrtFrame hrtFrameRead) {
+  void _request(final HrtTransmitter hrtTransmitter, final HrtFrame hrtFrameRead) {
     switch (hrtFrameRead.command) {
       case '00': //Identity Command
         _hrtFrameWrite.body = "";
@@ -51,8 +52,8 @@ class HrtBuild {
         _hrtFrameWrite.body = "";
         break;                
       case '06': //Write Polling Address
-        _hrtFrameWrite.body = "${hrtStorage.getVariable('polling_address')}"
-            "${hrtStorage.getVariable('loop_current_mode')}";
+        _hrtFrameWrite.body = "${hrtTransmitter.getVariable('polling_address')}"
+            "${hrtTransmitter.getVariable('loop_current_mode')}";
         break;
       case '07': //Read Loop Configuration
         _hrtFrameWrite.body = "";
@@ -67,7 +68,7 @@ class HrtBuild {
         _hrtFrameWrite.body = "";
         break;        
       case '11': //Read Unique Identifier Associated With Tag
-        _hrtFrameWrite.body = hrtStorage.getVariable('tag')!;
+        _hrtFrameWrite.body = hrtTransmitter.getVariable('tag')!;
         break;
       case '0C': //Read Message (12)
         _hrtFrameWrite.body = "";
@@ -80,42 +81,42 @@ class HrtBuild {
     }
   }
 
-  void _response(final HrtStorage hrtStorage, final HrtFrame hrtFrameRead) {
+  void _response(final HrtTransmitter hrtTransmitter, final HrtFrame hrtFrameRead) {
     switch (hrtFrameRead.command) {
       case '00': //Identity Command
         _hrtFrameWrite.body = "0000" //error_code
             "FE"
-            "${hrtStorage.getVariable('master_address')! | hrtStorage.getVariable('manufacturer_id')!}"
-            "${hrtStorage.getVariable('device_type')!}"
-            "${hrtStorage.getVariable('request_preambles')!}"
-            "${hrtStorage.getVariable('hart_revision')!}"
-            "${hrtStorage.getVariable('software_revision')!}"
-            "${hrtStorage.getVariable('transmitter_revision')!}"
-            "${hrtStorage.getVariable('hardware_revision')!}"
-            "${hrtStorage.getVariable('device_flags')!}"
-            "${hrtStorage.getVariable('device_id')!}";
+            "${hrtTransmitter.getVariable('master_address')! | hrtTransmitter.getVariable('manufacturer_id')!}"
+            "${hrtTransmitter.getVariable('device_type')!}"
+            "${hrtTransmitter.getVariable('request_preambles')!}"
+            "${hrtTransmitter.getVariable('hart_revision')!}"
+            "${hrtTransmitter.getVariable('software_revision')!}"
+            "${hrtTransmitter.getVariable('transmitter_revision')!}"
+            "${hrtTransmitter.getVariable('hardware_revision')!}"
+            "${hrtTransmitter.getVariable('device_flags')!}"
+            "${hrtTransmitter.getVariable('device_id')!}";
         break;
       case '01': //Read Primary Variable
         _hrtFrameWrite.body = "0000" //error_code
-            "${hrtStorage.getVariable('unit_code')}"
-            "${hrtStorage.getVariable('PROCESS_VARIABLE')}";
+            "${hrtTransmitter.getVariable('unit_code')}"
+            "${hrtTransmitter.getVariable('PROCESS_VARIABLE')}";
         break;
       case '02': //Read Loop Current And Percent Of Range
         _hrtFrameWrite.body = "0000" //error_code
-            "${hrtStorage.getVariable('loop_current')}"
-            "${hrtStorage.getVariable('percent_of_range')}";
+            "${hrtTransmitter.getVariable('loop_current')}"
+            "${hrtTransmitter.getVariable('percent_of_range')}";
         break;
       case '03': //Read Dynamic Variables And Loop Current
         _hrtFrameWrite.body = "0000" //error_code
-            "${hrtStorage.getVariable('loop_current')}"
-            "${hrtStorage.getVariable('unit_code')}"
-            "${hrtStorage.getVariable('PROCESS_VARIABLE')}"
-            "${hrtStorage.getVariable('unit_code')}"
-            "${hrtStorage.getVariable('PROCESS_VARIABLE')}"
-            "${hrtStorage.getVariable('unit_code')}"
-            "${hrtStorage.getVariable('PROCESS_VARIABLE')}"
-            "${hrtStorage.getVariable('unit_code')}"
-            "${hrtStorage.getVariable('PROCESS_VARIABLE')}";
+            "${hrtTransmitter.getVariable('loop_current')}"
+            "${hrtTransmitter.getVariable('unit_code')}"
+            "${hrtTransmitter.getVariable('PROCESS_VARIABLE')}"
+            "${hrtTransmitter.getVariable('unit_code')}"
+            "${hrtTransmitter.getVariable('PROCESS_VARIABLE')}"
+            "${hrtTransmitter.getVariable('unit_code')}"
+            "${hrtTransmitter.getVariable('PROCESS_VARIABLE')}"
+            "${hrtTransmitter.getVariable('unit_code')}"
+            "${hrtTransmitter.getVariable('PROCESS_VARIABLE')}";
         break;
       case '04': //
         _hrtFrameWrite.body = "0000";
@@ -126,23 +127,23 @@ class HrtBuild {
       case '06': //Write Polling Address
         final pollingAddress = hrtFrameRead.body.substring(0, 2);
         final loopCurrentMode = hrtFrameRead.body.substring(2);
-        hrtStorage.setVariable('polling_address', pollingAddress);
-        hrtStorage.setVariable('loop_current_mode', loopCurrentMode);
+        hrtTransmitter.setVariable('polling_address', pollingAddress);
+        hrtTransmitter.setVariable('loop_current_mode', loopCurrentMode);
         _hrtFrameWrite.body = "0000" //error_code
             "$pollingAddress"
             "$loopCurrentMode";
         break;
       case '07': //Read Loop Configuration
         _hrtFrameWrite.body = "0000" //error_code
-            "${hrtStorage.getVariable('polling_address')}"
-            "${hrtStorage.getVariable('loop_current_mode')}";
+            "${hrtTransmitter.getVariable('polling_address')}"
+            "${hrtTransmitter.getVariable('loop_current_mode')}";
         break;
       case '08': //Read Dynamic Variable Classifications
         _hrtFrameWrite.body = "0000" //error_code
-            "${hrtStorage.getVariable('primary_variable_classification')}"
-            "${hrtStorage.getVariable('secondary_variable_classification')}"
-            "${hrtStorage.getVariable('tertiary_variable_classification')}"
-            "${hrtStorage.getVariable('quaternary_variable_classification')}";
+            "${hrtTransmitter.getVariable('primary_variable_classification')}"
+            "${hrtTransmitter.getVariable('secondary_variable_classification')}"
+            "${hrtTransmitter.getVariable('tertiary_variable_classification')}"
+            "${hrtTransmitter.getVariable('quaternary_variable_classification')}";
         break;
       case '09': //Read Device Variables with Status
         _hrtFrameWrite.body = "0000";
@@ -152,27 +153,27 @@ class HrtBuild {
         break;
       case '0B': //Read Unique Identifier Associated With Tag (11)
         _hrtFrameWrite.body =
-            "${(hrtFrameRead.body == hrtStorage.getVariable('tag')) ? '00' : '01'}"
+            "${(hrtFrameRead.body == hrtTransmitter.getVariable('tag')) ? '00' : '01'}"
             "FE"
-            "${hrtStorage.getVariable('master_slave')! | hrtStorage.getVariable('manufacturer_id')!}"
-            "${hrtStorage.getVariable('device_type')}"
-            "${hrtStorage.getVariable('request_preambles')}"
-            "${hrtStorage.getVariable('hart_revision')}"
-            "${hrtStorage.getVariable('software_revision')}"
-            "${hrtStorage.getVariable('transmitter_revision')}"
-            "${hrtStorage.getVariable('hardware_revision')}"
-            "${hrtStorage.getVariable('device_flags')}"
-            "${hrtStorage.getVariable('device_id')}";
+            "${hrtTransmitter.getVariable('master_slave')! | hrtTransmitter.getVariable('manufacturer_id')!}"
+            "${hrtTransmitter.getVariable('device_type')}"
+            "${hrtTransmitter.getVariable('request_preambles')}"
+            "${hrtTransmitter.getVariable('hart_revision')}"
+            "${hrtTransmitter.getVariable('software_revision')}"
+            "${hrtTransmitter.getVariable('transmitter_revision')}"
+            "${hrtTransmitter.getVariable('hardware_revision')}"
+            "${hrtTransmitter.getVariable('device_flags')}"
+            "${hrtTransmitter.getVariable('device_id')}";
         break;
       case '0C': //Read Message (12)
         _hrtFrameWrite.body = "0000" //error_code
-            "${hrtStorage.getVariable('message')}";
+            "${hrtTransmitter.getVariable('message')}";
         break;
       case '0D': //Read Tag, Descriptor, Date (13)
         _hrtFrameWrite.body = "0000" //error_code
-            "${hrtStorage.getVariable('tag')}"
-            "${hrtStorage.getVariable('descriptor')}"
-            "${hrtStorage.getVariable('date')}";
+            "${hrtTransmitter.getVariable('tag')}"
+            "${hrtTransmitter.getVariable('descriptor')}"
+            "${hrtTransmitter.getVariable('date')}";
         break;
       case '0E': //Read Primary Variable Transducer Information (14)
         _hrtFrameWrite.body =

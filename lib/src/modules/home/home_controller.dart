@@ -19,6 +19,7 @@ class HomeController extends Disposable {
   late final HrtComm hrtComm;
   late final HrtTransmitter hrtTransmitter;
   final connectNotifier = ValueNotifier<String>("");
+  final ftOutputValue = ValueNotifier<double>(0.0);  
   final sendNotifier = ValueNotifier<String>("");
   final hrtFrameWrite = HrtFrame();
   final textController = TextEditingController();
@@ -41,10 +42,10 @@ class HomeController extends Disposable {
   // void changedFuncs(Map<String, (String, double?)> notifier) {
   //   _hrtTransmitterController.sink
   //       .add(notifier); // Enviar o novo valor para o Stream
-  //} 
+  //}
 
   HomeController(this.hrtComm) {
-    hrtTransmitter = HrtTransmitter(selectedInstrument);
+    hrtTransmitter = HrtTransmitter(selectedInstrument,ftOutputValue);
   }
 
   // Future<bool> init() async {
@@ -55,8 +56,8 @@ class HomeController extends Disposable {
     if (e == 'CONNECTED') {
       textController.text = "";
       hrtComm.funcRead = readHrtFrame;
-      tankTransfFunction.start(plantInputValue,
-          (value) => hrtTransmitter.updateInputValue(value));
+      tankTransfFunction.start(
+          plantInputValue, ftOutputValue);
       if (!hrtComm.connect()) {
         Future.delayed(const Duration(milliseconds: 500)).then((_) {
           connectNotifier.value = "DISCONNECTED";

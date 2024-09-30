@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
@@ -24,27 +25,22 @@ class TransferFunction {
 
   // Discretização usando a Transformada Bilinear (Tustin) para espaço de estado
   void _discretize() {
-    // Converter a função de transferência para espaço de estado
     var continuousModel = _transferFunctionToStateSpace(numerator, denominator);
-    double Ts =
-        samplingTime.inMilliseconds / 1000.0; // Convertendo para segundos
+    double Ts = samplingTime.inMilliseconds / 1000.0; // Convertendo para segundos
 
     // Obter a matriz A discreta como e^(A * Ts)
     List<List<double>> Ad = _matrixExponential(continuousModel['A']!, Ts);
 
-    // Calcular Bd usando a relação B_d = A^-1 * (A_d - I) * B
     List<List<double>> I = List.generate(order, (i) => List.filled(order, 0.0));
     for (int i = 0; i < order; i++) {
       I[i][i] = 1.0;
     }
 
-    List<List<double>> AdMinusI =
-        _matrixAdd(Ad, _matrixScalarMultiply(I, -1.0));
+    List<List<double>> AdMinusI = _matrixAdd(Ad, _matrixScalarMultiply(I, -1.0));
     List<List<double>> AInv = _matrixInverse1x1(continuousModel['A']!);
     List<List<double>> Bd =
         _matrixMultiply(_matrixMultiply(AInv, AdMinusI), continuousModel['B']!);
 
-    // Atribuindo valores às matrizes discretas
     discreteA = Ad;
     discreteB = Bd;
     C = continuousModel['C']!;
@@ -56,41 +52,109 @@ class TransferFunction {
     isStop.value = true;
   }
 
-  // Simulação do sistema com entrada personalizada
-  void start(ValueNotifier<double> input, void Function(double) outputFunc) {
-    Timer.periodic(samplingTime, (timer) {
+  // Função para iniciar a simulação usando uma Isolate
+  void start(ValueNotifier<double> input,ValueNotifier<double> output) async {
+    // Garantir que apenas um ReceivePort seja escutado
+    ReceivePort receivePort = ReceivePort();
+    SendPort sendPort;
+
+    // Iniciar a Isolate
+    Isolate isolate = await Isolate.spawn(_simulationIsolate, receivePort.sendPort);
+
+    StreamSubscription subscription;
+    Completer<SendPort> completer = Completer();
+
+    // Escutar o ReceivePort para obter o SendPort da Isolate
+    subscription = receivePort.listen((message) {
+      if (message is SendPort && !completer.isCompleted) {
+        completer.complete(message);  // Recebe o SendPort da Isolate
+      } else if (message is Map && message.containsKey('state') && message.containsKey('output')) {
+        // Atualizar o estado e a saída
+        state = List.from(message['state']);
+        output.value = message['output'];
+      }
+    });
+
+    // Obter o SendPort da Isolate
+    sendPort = await completer.future;
+
+    // Enviar dados iniciais para a Isolate
+    sendPort.send({
+      'start': true,
+      'input': input.value,
+      'state': state,
+      'discreteA': discreteA,
+      'discreteB': discreteB,
+      'C': C,
+      'D': D,
+      'samplingTime': samplingTime.inMilliseconds
+    });
+
+    // Parar a simulação quando o usuário solicitar
+    isStop.addListener(() {
       if (isStop.value) {
-        isStop.value = false;
-        timer.cancel();
-        return;
+        sendPort.send({'stop': true});
+        subscription.cancel();
+        receivePort.close();
+        isolate.kill();
       }
-
-      // Atualizar o vetor de estado
-      List<double> nextState = List.filled(order, 0.0);
-      for (int i = 0; i < order; i++) {
-        double sumA = 0.0;
-        for (int j = 0; j < order; j++) {
-          sumA += discreteA[i][j] * state[j];
-        }
-        double sumB = discreteB[i][0] * input.value;
-        nextState[i] = sumA + sumB;
-      }
-
-      // Atualizar o vetor de estado
-      state = nextState;
-
-      // Calcular a saída do sistema
-      double _output = 0.0;
-      for (int i = 0; i < C[0].length; i++) {
-        _output += C[0][i] * state[i];
-      }
-      _output += D[0][0] * input.value;
-
-      // Atualizar o valor da saída
-      outputFunc(_output);     
     });
   }
 
+  // Função executada dentro da Isolate
+  static void _simulationIsolate(SendPort mainSendPort) {
+    ReceivePort isolateReceivePort = ReceivePort();
+    mainSendPort.send(isolateReceivePort.sendPort);
+
+    Timer? timer;
+
+    isolateReceivePort.listen((message) {
+      if (message['stop'] == true) {
+        timer?.cancel();
+        return;
+      }
+
+      if (message['start'] == true) {
+        List<List<double>> discreteA = message['discreteA'];
+        List<List<double>> discreteB = message['discreteB'];
+        List<List<double>> C = message['C'];
+        List<List<double>> D = message['D'];
+        List<double> state = List.from(message['state']);
+        double input = message['input'];
+        int order = discreteA.length;
+        int samplingTime = message['samplingTime'];
+
+        // Iniciar o Timer.periodic dentro da Isolate
+        timer = Timer.periodic(Duration(milliseconds: samplingTime), (timer) {
+          // Atualizar o vetor de estado
+          List<double> nextState = List.filled(order, 0.0);
+          for (int i = 0; i < order; i++) {
+            double sumA = 0.0;
+            for (int j = 0; j < order; j++) {
+              sumA += discreteA[i][j] * state[j];
+            }
+            double sumB = discreteB[i][0] * input;
+            nextState[i] = sumA + sumB;
+          }
+
+          // Calcular a saída do sistema
+          double output = 0.0;
+          for (int i = 0; i < C[0].length; i++) {
+            output += C[0][i] * nextState[i];
+          }
+          output += D[0][0] * input;
+
+          // Enviar o novo estado e a saída de volta para a thread principal
+          mainSendPort.send({'state': nextState, 'output': output});
+
+          // Atualizar o estado
+          state = nextState;
+        });
+      }
+    });
+  }
+
+  // ATe aqui
   // Função para converter a função de transferência em espaço de estado
   Map<String, List<List<double>>> _transferFunctionToStateSpace(
       List<double> numerator, List<double> denominator) {
