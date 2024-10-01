@@ -72,6 +72,15 @@ class _CustomTankState extends State<CustomTank> {
                         ),
                       ),
                     ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Image.asset(
+                        "assets/trans_nivel.png",
+                        scale:8,
+                        alignment: Alignment.center,
+                      ),
+                    ),
                   ],
                 ),
               );
