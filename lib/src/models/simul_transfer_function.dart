@@ -64,6 +64,9 @@ class TransferFunction extends Disposable {
     _isolate?.kill(priority: Isolate.immediate);
   }
 
+  reestart() => _sendPort?.send(
+      {'mode': 'setState', 'state': List.filled(denominator.length - 1, 0.0)});
+
   setInputValue(double input) =>
       _sendPort?.send({'mode': 'input', 'input': input});
 
@@ -122,6 +125,8 @@ class TransferFunction extends Disposable {
       } else if (message['mode'] == 'close') {
         timer?.cancel();
         isolateReceivePort.close();
+      } else if (message['mode'] == 'setState') {
+        state = List.from(message['state']);
       } else if (message['mode'] == 'init') {
         // Inicializa os dados recebidos
         discreteA = message['discreteA'];

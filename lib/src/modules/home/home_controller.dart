@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -14,7 +13,7 @@ import '../../models/simul_transfer_function.dart';
 // Exemplo de função de transferência de 2ª ordem
 const List<double> numeratorTF = [1.0]; // Coeficientes do numerador
 const List<double> denominatorTF = [0.07, 0.0000000001]; // Coef. do Denom.
-const samplingTime = Duration(seconds: 1); // Tempo de amostragem
+const samplingTime = Duration(milliseconds: 100); // Tempo de amostragem
 
 class HomeController extends Disposable {
   late final HrtComm hrtComm;

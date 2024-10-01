@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildLogContainer() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      height: 200,
+      height: 150,
       child: TextField(
         readOnly: true,
         controller: controller.textController,
