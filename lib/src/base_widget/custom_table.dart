@@ -47,6 +47,7 @@ class _CustomTableState extends State<CustomTable> {
 
   Widget _buildHeader() {
     return Container(
+      height: 35,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black),
       ),
@@ -69,6 +70,7 @@ class _CustomTableState extends State<CustomTable> {
 
   Widget _buildListRow(String name) {
     return Container(
+      height: 35,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black), // Simula as linhas de grade
       ),
@@ -97,17 +99,24 @@ class _CustomTableState extends State<CustomTable> {
   }) {
     return Container(
       color: color,
-      padding: const EdgeInsets.all(8.0),
+      alignment:
+          Alignment.center, // Certifica-se de que o conteúdo está centralizado
+      padding:
+          const EdgeInsets.all(8.0), // Padding mínimo para evitar deslocamento
       child: TextField(
         controller: TextEditingController(text: text),
-        textAlign: TextAlign.center,
+        textAlign: TextAlign.center, // Garante que o texto fique no centro
         style: TextStyle(
           color: txtColor,
           fontSize: 16,
           fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
         ),
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           border: InputBorder.none,
+          isDense:
+              true, // Reduz o tamanho do TextField, para evitar muito espaço vertical
+          contentPadding:
+              EdgeInsets.zero, // Remove o padding interno do TextField
         ),
         readOnly: onChanged == null,
         onChanged: (newValue) {
@@ -131,10 +140,13 @@ class _CustomTableState extends State<CustomTable> {
       'SReal' || 'FLOAT' => func.substring(0, 1) == '@'
           ? AnimatedBuilder(
               animation: controller.hrtTransmitter,
-              builder: (context, child) =>
-                  _tableTextField(controller.hrtTransmitter.funcValues[name]!.funcValue.toString()))
+              builder: (context, child) => _tableTextField(controller
+                  .hrtTransmitter.funcValues[name]!.funcValue
+                  .toString()))
           : _tableTextField(
-              controller.hrtTransmitter.getTransmitterValue(name, func).toString(),
+              controller.hrtTransmitter
+                  .getTransmitterValue(name, func)
+                  .toString(),
               onChanged: (newValue) {
                 controller.hrtTransmitter.setVariable(
                     name, hrtTypeHexFrom(double.parse(newValue), "FLOAT"));
