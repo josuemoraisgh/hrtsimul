@@ -33,3 +33,7 @@ flutter:
   assets:
     - assets/trans_nivel.png
     - assets/bomba.png    
+  fonts:
+    - family: SourceSansPro
+      fonts:
+        - asset: assets/fonts/SourceSans3-Regular.ttf   

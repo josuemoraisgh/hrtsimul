@@ -33,12 +33,12 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 10),
           Expanded(
             child: Row(children: [
-              CustomTank('percent_of_range'),
-              const CustomTable(),
+              Expanded(child: CustomTank('percent_of_range')),
+              //const CustomTable(),
             ]),
           ),
-          const SizedBox(height: 10),
-          _buildLogContainer(),
+          //const SizedBox(height: 10),
+          //_buildLogContainer(),
           const SizedBox(height: 10),
           _buildControls(),
         ],
