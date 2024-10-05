@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import '../../base_widget/custom_table.dart';
 import '../../base_widget/custom_tanque.dart';
+import '../../base_widget/tanque.dart';
 import '../../models/hrt_settings.dart';
 import './home_controller.dart';
 import '../../base_widget/custom_button.dart';
@@ -33,7 +34,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 10),
           Expanded(
             child: Row(children: [
-              Expanded(child: CustomTank('percent_of_range')),
+              Expanded(child: Tanque() /*CustomTank('percent_of_range')*/),
               //const CustomTable(),
             ]),
           ),

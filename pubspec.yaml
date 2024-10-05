@@ -32,7 +32,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/trans_nivel.png
-    - assets/bomba.png    
+    - assets/bomba.png   
+    - assets/bomba_centrifuga.png        
   fonts:
     - family: SourceSansPro
       fonts:

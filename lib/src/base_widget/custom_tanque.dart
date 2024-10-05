@@ -26,8 +26,11 @@ class _CustomTankState extends State<CustomTank> {
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          var _heightValue = constraints.maxHeight - 50;
-          var widthValue = constraints.maxWidth;
+          final _heightValue = constraints.maxHeight;
+          final _widthValue = constraints.maxWidth;
+          final _widthTanque =
+              _widthValue >= 737.0 ? 380.0 : _widthValue - 357.0;
+
           return AnimatedBuilder(
             animation: controller.hrtTransmitter,
             builder: (context, child) {
@@ -37,110 +40,44 @@ class _CustomTankState extends State<CustomTank> {
                 controller.tankTransfFunction.reestart();
                 _currentLevel = 0.0;
               }
-              return Container(
-                width: widthValue,
-                height: constraints.maxHeight,
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 90),
-                      child: Container(
-                        width: widthValue - 250,
-                        height: _heightValue,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.blueGrey, width: 2),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10.0),
-                            topRight: Radius.circular(10.0),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 10,
-                              offset: Offset(5, 5), // posição da sombra
-                            ),
-                          ],
-                        ),
-                      ),
+              return Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  // Tanque
+                  _buildTanque(width: _widthTanque, height: _heightValue),
+                  // Visor de nível
+                  _buildVisor(
+                      level: _currentLevel,
+                      width: _widthTanque,
+                      height: _heightValue),
+                  Positioned(
+                    bottom: 0,
+                    right: _widthValue / 2 - _widthTanque,
+                    child: Image.asset(
+                      "assets/trans_nivel.png",
+                      scale: 6,
+                      alignment: Alignment.center,
                     ),
-                    // Visor de nível
-                    Padding(
-                      padding: const EdgeInsets.only(left: 90),
-                      child: Container(
-                        width: widthValue - 250, // Largura do líquido
-                        height: (_currentLevel / 100) *
-                            _heightValue, // Altura do nível
-
-                        decoration: BoxDecoration(
-                          color: Colors.blue, // Cor do líquido
-                          //borderRadius: BorderRadius.circular(10),
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.blueGrey, // Cor da borda superior
-                              width: 2.0, // Espessura da borda superior
-                            ),
-                            left: BorderSide(
-                              color: Colors.blueGrey, // Cor da borda superior
-                              width: 2.0, // Espessura da borda superior
-                            ),
-                            bottom: BorderSide(
-                              color: Colors.blueGrey, // Cor da borda inferior
-                              width: 2.0, // Espessura da borda inferior
-                            ),
-                          ),
-                        ),
-                      ),
+                  ),
+                  _buildTubulacao(
+                    left: (_widthValue - _widthTanque) / 2 + 100 - 40,
+                    bottom: 54,
+                    width: 40,
+                    height: 20,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: _widthValue / 2 - _widthTanque,
+                    child: Image.asset(
+                      "assets/bomba_centrifuga.png",
+                      scale: 2.0,
+                      alignment: Alignment.center,
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Image.asset(
-                        "assets/trans_nivel.png",
-                        scale: 6,
-                        alignment: Alignment.center,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      child: Image.asset(
-                        "assets/bomba.png",
-                        scale: 1.5,
-                        alignment: Alignment.center,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 34,
-                      left: 144,
-                      child: Container(
-                        width: 28, // Largura do líquido
-                        height: 20, // Altura do nível
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          border: Border(
-                            top: BorderSide(
-                              color: Colors.blueGrey, // Cor da borda superior
-                              width: 2.0, // Espessura da borda superior
-                            ),
-                            bottom: BorderSide(
-                              color: Colors.blueGrey, // Cor da borda inferior
-                              width: 2.0, // Espessura da borda inferior
-                            ),
-                          ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(5.0),
-                            bottomLeft: Radius.circular(5.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                    _buildIndicador(_currentLevel, _heightValue),
-                    _buildSlider(),
-                  ],
-                ),
+                  ),
+                  _buildIndicador(_currentLevel, (_widthValue + 100) / 2 + 45,
+                      _heightValue / 2),
+                  _buildSlider((_widthValue - _widthTanque) / 2 - 100),
+                ],
               );
             },
           );
@@ -149,11 +86,74 @@ class _CustomTankState extends State<CustomTank> {
     );
   }
 
+  Widget _buildTanque({final double width = 0, final double height = 0}) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 200, bottom: 50),
+      child: Container(
+        width: width,
+        height: height - 70,
+        decoration: BoxDecoration(
+          color: Colors.grey[700],
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Colors.grey[600]!, Colors.grey[400]!, Colors.grey[600]!],
+          ),
+          border: Border.all(color: Colors.blueGrey, width: 2),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10.0),
+            topRight: Radius.circular(10.0),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 10,
+              offset: Offset(5, 5), // posição da sombra
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVisor(
+      {final double level = 0,
+      final double width = 0,
+      final double height = 0}) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 200, bottom: 50),
+      child: Container(
+        width: width,
+        height: (level / 100) * (height - 70), // Altura do nível
+        decoration: BoxDecoration(
+          color: Colors.blue, // Cor do líquido
+          //borderRadius: BorderRadius.circular(10),
+          border: Border(
+            right: BorderSide(
+              color: Colors.blueGrey, // Cor da borda superior
+              width: 2.0, // Espessura da borda superior
+            ),
+            left: BorderSide(
+              color: Colors.blueGrey, // Cor da borda superior
+              width: 2.0, // Espessura da borda superior
+            ),
+            bottom: BorderSide(
+              color: Colors.blueGrey, // Cor da borda inferior
+              width: 2.0, // Espessura da borda inferior
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   // Texto para mostrar o nível
-  Widget _buildIndicador(double _currentLevel, double _heightValue) {
+  Widget _buildIndicador(
+      double _currentLevel, double _posLeft, double _posBottom) {
     return Positioned(
-      left: 200,
-      bottom: (_currentLevel / 100) * _heightValue + 10,
+      left: _posLeft,
+      bottom: _posBottom,
       child: Text(
         '${_currentLevel.toStringAsFixed(1)}%',
         style: TextStyle(
@@ -165,10 +165,10 @@ class _CustomTankState extends State<CustomTank> {
     );
   }
 
-  Widget _buildSlider() {
+  Widget _buildSlider(double _posLeft) {
     return Positioned(
-      bottom: 70,
-      left: 30,
+      bottom: 150,
+      left: _posLeft,
       child: ValueListenableBuilder<double>(
         valueListenable: controller.plantInputValue,
         builder: (context, value, child) => Center(
@@ -196,6 +196,45 @@ class _CustomTankState extends State<CustomTank> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Texto para mostrar o nível
+  Widget _buildTubulacao({
+    double left = 0,
+    double bottom = 0,
+    double width = 0,
+    double height = 0,
+  }) {
+    return Positioned(
+      bottom: bottom, // 34,
+      left: left, //144,
+      child: Container(
+        width: width, //52, // Largura do líquido
+        height: height, //20, // Altura do nível
+        decoration: BoxDecoration(
+          color: Colors.grey[700],
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.grey[600]!, Colors.grey[400]!, Colors.grey[600]!],
+          ),
+          border: Border(
+            top: BorderSide(
+              color: Colors.blueGrey, // Cor da borda superior
+              width: 2.0, // Espessura da borda superior
+            ),
+            bottom: BorderSide(
+              color: Colors.blueGrey, // Cor da borda inferior
+              width: 2.0, // Espessura da borda inferior
+            ),
+          ),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(5.0),
+            bottomLeft: Radius.circular(5.0),
           ),
         ),
       ),
