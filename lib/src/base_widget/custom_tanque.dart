@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 import '../modules/home/home_controller.dart';
+import 'tanque.dart';
 
 class CustomTank extends StatefulWidget {
   final String varkey;
@@ -29,8 +30,7 @@ class _CustomTankState extends State<CustomTank> {
           final _heightValue = constraints.maxHeight;
           final _widthValue = constraints.maxWidth;
           final _widthTanque =
-              _widthValue >= 737.0 ? 380.0 : _widthValue - 357.0;
-
+              _widthValue >= 760.0 ? 500.0 : _widthValue - 260.0;
           return AnimatedBuilder(
             animation: controller.hrtTransmitter,
             builder: (context, child) {
@@ -44,106 +44,33 @@ class _CustomTankState extends State<CustomTank> {
                 alignment: Alignment.bottomCenter,
                 children: [
                   // Tanque
-                  _buildTanque(width: _widthTanque, height: _heightValue),
-                  // Visor de nível
-                  _buildVisor(
-                      level: _currentLevel,
-                      width: _widthTanque,
-                      height: _heightValue),
+                  Tanque(currentLevel: _currentLevel),
                   Positioned(
-                    bottom: 0,
-                    right: _widthValue / 2 - _widthTanque,
+                    bottom: _heightValue*0.05,
+                    right: _widthValue/2 - _widthTanque * 0.45,
                     child: Image.asset(
                       "assets/trans_nivel.png",
                       scale: 6,
                       alignment: Alignment.center,
                     ),
                   ),
-                  _buildTubulacao(
-                    left: (_widthValue - _widthTanque) / 2 + 100 - 40,
-                    bottom: 54,
-                    width: 40,
-                    height: 20,
-                  ),
                   Positioned(
                     bottom: 0,
-                    left: _widthValue / 2 - _widthTanque,
+                    left: _widthValue/2 -_widthTanque*0.8,
                     child: Image.asset(
                       "assets/bomba_centrifuga.png",
                       scale: 2.0,
                       alignment: Alignment.center,
                     ),
                   ),
-                  _buildIndicador(_currentLevel, (_widthValue + 100) / 2 + 45,
+                  _buildIndicador(_currentLevel, _widthValue/2,
                       _heightValue / 2),
-                  _buildSlider((_widthValue - _widthTanque) / 2 - 100),
+                  _buildSlider( _widthValue/2 -_widthTanque*0.6),
                 ],
               );
             },
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildTanque({final double width = 0, final double height = 0}) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 200, bottom: 50),
-      child: Container(
-        width: width,
-        height: height - 70,
-        decoration: BoxDecoration(
-          color: Colors.grey[700],
-          gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [Colors.grey[600]!, Colors.grey[400]!, Colors.grey[600]!],
-          ),
-          border: Border.all(color: Colors.blueGrey, width: 2),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10.0),
-            topRight: Radius.circular(10.0),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 10,
-              offset: Offset(5, 5), // posição da sombra
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVisor(
-      {final double level = 0,
-      final double width = 0,
-      final double height = 0}) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 200, bottom: 50),
-      child: Container(
-        width: width,
-        height: (level / 100) * (height - 70), // Altura do nível
-        decoration: BoxDecoration(
-          color: Colors.blue, // Cor do líquido
-          //borderRadius: BorderRadius.circular(10),
-          border: Border(
-            right: BorderSide(
-              color: Colors.blueGrey, // Cor da borda superior
-              width: 2.0, // Espessura da borda superior
-            ),
-            left: BorderSide(
-              color: Colors.blueGrey, // Cor da borda superior
-              width: 2.0, // Espessura da borda superior
-            ),
-            bottom: BorderSide(
-              color: Colors.blueGrey, // Cor da borda inferior
-              width: 2.0, // Espessura da borda inferior
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -196,45 +123,6 @@ class _CustomTankState extends State<CustomTank> {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Texto para mostrar o nível
-  Widget _buildTubulacao({
-    double left = 0,
-    double bottom = 0,
-    double width = 0,
-    double height = 0,
-  }) {
-    return Positioned(
-      bottom: bottom, // 34,
-      left: left, //144,
-      child: Container(
-        width: width, //52, // Largura do líquido
-        height: height, //20, // Altura do nível
-        decoration: BoxDecoration(
-          color: Colors.grey[700],
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.grey[600]!, Colors.grey[400]!, Colors.grey[600]!],
-          ),
-          border: Border(
-            top: BorderSide(
-              color: Colors.blueGrey, // Cor da borda superior
-              width: 2.0, // Espessura da borda superior
-            ),
-            bottom: BorderSide(
-              color: Colors.blueGrey, // Cor da borda inferior
-              width: 2.0, // Espessura da borda inferior
-            ),
-          ),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(5.0),
-            bottomLeft: Radius.circular(5.0),
           ),
         ),
       ),
