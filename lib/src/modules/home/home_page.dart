@@ -46,26 +46,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildTitle() {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.only(
-          left: 10, right: 10, bottom: 5), // Espaço interno
-      decoration: BoxDecoration(
-        color: Colors.blue, // Cor de fundo azul
-        borderRadius: BorderRadius.circular(12), // Bordas arredondadas
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26, // Sombra
-            blurRadius: 8, // Intensidade da sombra
-            offset: Offset(0, 4), // Posição da sombra
+          top: 20), // Espaço interno
+      child: Container(
+      padding: const EdgeInsets.only(
+         left: 10, right: 10), // Espaço interno        
+        decoration: BoxDecoration(
+          color: Colors.blue, // Cor de fundo azul
+          borderRadius: BorderRadius.circular(12), // Bordas arredondadas
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26, // Sombra
+              blurRadius: 8, // Intensidade da sombra
+              offset: Offset(0, 4), // Posição da sombra
+            ),
+          ],
+        ),
+        child: const Text(
+          "Process simulator with hart devices",
+          style: TextStyle(
+            fontSize: 28,
+            color: Colors.white, // Cor do texto em branco
+            fontWeight: FontWeight.bold, // Texto em negrito
           ),
-        ],
-      ),
-      child: const Text(
-        "Hart Simulate 1.0",
-        style: TextStyle(
-          fontSize: 28,
-          color: Colors.white, // Cor do texto em branco
-          fontWeight: FontWeight.bold, // Texto em negrito
         ),
       ),
     );
