@@ -31,6 +31,7 @@ class HomeController extends Disposable {
       TransferFunction(numeratorTF, denominatorTF, samplingTime);
   final plantInputValue = ValueNotifier<double>(1.0);
   final plantOutputValue = ValueNotifier<double>(0.0);
+  final tankLeakValue = ValueNotifier<double>(0.0000000001);
 
   HomeController(this.hrtComm) {
     hrtTransmitter = HrtTransmitter(selectedInstrument, plantOutputValue);

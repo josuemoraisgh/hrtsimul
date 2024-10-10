@@ -7,7 +7,7 @@ import 'src/app_widget.dart';
 Box<dynamic>? boxHrtStorage;
 
 Future<void> main() async {
-  //WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   boxHrtStorage ??= await Hive.openBox<dynamic>('HRTSTORAGE');  
   runApp(ModularApp(module: AppModule(), child: const AppWidget()));

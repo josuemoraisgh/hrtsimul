@@ -1,19 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import '../home_controller.dart';
+import '../../../base_widget/custom_tank.dart';
 
-import '../modules/home/home_controller.dart';
-import 'tanque.dart';
-
-class CustomTank extends StatefulWidget {
+class LevelControlView extends StatefulWidget {
   final String varkey;
 
-  CustomTank(this.varkey) {}
+  LevelControlView(this.varkey) {}
 
   @override
-  _CustomTankState createState() => _CustomTankState();
+  _LevelControlViewState createState() => _LevelControlViewState();
 }
 
-class _CustomTankState extends State<CustomTank> {
+class _LevelControlViewState extends State<LevelControlView> {
   final controller = Modular.get<HomeController>();
 
   @override
@@ -41,13 +41,21 @@ class _CustomTankState extends State<CustomTank> {
                 _currentLevel = 0.0;
               }
               return Stack(
-                alignment: Alignment.bottomCenter,
+                //alignment: Alignment.bottomCenter,
                 children: [
                   // Tanque
-                  Tanque(currentLevel: _currentLevel),
+                  Center(
+                    child: CustomPaint(
+                      size: Size(
+                        _widthTanque,
+                        _heightValue, // Definindo a altura com base na tela
+                      ),
+                      painter: TankPainter(currentLevel: _currentLevel),
+                    ),
+                  ),
                   Positioned(
-                    bottom: _heightValue*0.05,
-                    right: _widthValue/2 - _widthTanque * 0.45,
+                    bottom: _heightValue * 0.06,
+                    right: _widthValue / 2 - _widthTanque * 0.45,
                     child: Image.asset(
                       "assets/trans_nivel.png",
                       scale: 6,
@@ -56,16 +64,26 @@ class _CustomTankState extends State<CustomTank> {
                   ),
                   Positioned(
                     bottom: 0,
-                    left: _widthValue/2 -_widthTanque*0.8,
+                    left: _widthValue / 2 - _widthTanque * 0.8,
                     child: Image.asset(
                       "assets/bomba_centrifuga.png",
                       scale: 2.0,
                       alignment: Alignment.center,
                     ),
                   ),
-                  _buildIndicador(_currentLevel, _widthValue/2,
-                      _heightValue / 2),
-                  _buildSlider( _widthValue/2 -_widthTanque*0.6),
+                  _buildIndicador(
+                      _currentLevel, _widthValue / 2, _heightValue / 2),
+                  _buildSlider(
+                    controller.plantInputValue,
+                    _widthValue / 2 - _widthTanque * 0.6,
+                    150,
+                  ),
+                  _buildSlider(
+                    controller.tankLeakValue,
+                    _widthValue / 2 + _widthTanque * 0.55,
+                    _heightValue * 0.05,
+                    min: 0.0000000001
+                  ),
                 ],
               );
             },
@@ -92,12 +110,13 @@ class _CustomTankState extends State<CustomTank> {
     );
   }
 
-  Widget _buildSlider(double _posLeft) {
+  Widget _buildSlider(
+      ValueListenable<double> valueListenable, double _posLeft, double bottom, {final double min = 0,final double max = 10}) {
     return Positioned(
-      bottom: 150,
+      bottom: bottom,
       left: _posLeft,
       child: ValueListenableBuilder<double>(
-        valueListenable: controller.plantInputValue,
+        valueListenable: valueListenable,
         builder: (context, value, child) => Center(
           child: Column(
             children: [
@@ -115,8 +134,8 @@ class _CustomTankState extends State<CustomTank> {
                       .centerLeft, // Garante que ocupe a altura total possível
                   child: Slider(
                     value: value,
-                    min: 0,
-                    max: 10,
+                    min: min,
+                    max: max,
                     onChanged: (newValue) =>
                         controller.plantInputValue.value = newValue,
                   ),
