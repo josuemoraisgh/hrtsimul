@@ -170,6 +170,44 @@ class TransferFunction extends Disposable {
     });
   }
 
+  void updateParameters(
+      List<double> newNumerator, List<double> newDenominator) {
+    // Verifica se a ordem do denominador mudou
+    bool orderChanged = newDenominator.length - 1 != order;
+
+    // Atualiza o numerador e denominador
+    numerator
+      ..clear()
+      ..addAll(newNumerator);
+
+    denominator
+      ..clear()
+      ..addAll(newDenominator);
+
+    // Atualiza a ordem
+    order = denominator.length - 1;
+
+    // Se a ordem mudou, reinicializa o vetor de estado
+    if (orderChanged) {
+      state =
+          List.filled(order, 0.0); // Reinicializa o vetor de estado com zeros
+    }
+
+    // Recalcular as matrizes discretas com os novos parâmetros
+    _discretize();
+
+    // Enviar os novos parâmetros para a Isolate
+    _sendPort?.send({
+      'mode': 'init',
+      'discreteA': discreteA,
+      'discreteB': discreteB,
+      'C': C,
+      'D': D,
+      'state': state,
+      'samplingTime': samplingTime.inMilliseconds,
+    });
+  }
+
   // As funções auxiliares continuam as mesmas
   Map<String, List<List<double>>> _transferFunctionToStateSpace(
       List<double> numerator, List<double> denominator) {

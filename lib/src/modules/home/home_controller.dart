@@ -35,6 +35,9 @@ class HomeController extends Disposable {
 
   HomeController(this.hrtComm) {
     hrtTransmitter = HrtTransmitter(selectedInstrument, plantOutputValue);
+    tankLeakValue.addListener((){
+    tankTransfFunction.updateParameters([1.0, 2.0], [1.0, 0.5, 0.2]);
+    });
   }
 
   Future<void> hrtButtonConnect(String? e) async {

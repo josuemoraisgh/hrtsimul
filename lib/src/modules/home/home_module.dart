@@ -7,8 +7,8 @@ import 'home_page.dart';
 class HomeModule extends Module {
   @override
   void binds(Injector i) {
-    i.addInstance<HrtComm>(HrtComm());    
-    i.addInstance<HomeController>(HomeController(i<HrtComm>()));         
+    //i.addInstance<HrtComm>(HrtComm());    
+    i.addInstance<HomeController>(HomeController(HrtComm()));         
   }
 
   @override

@@ -51,31 +51,40 @@ class TankPainter extends CustomPainter {
       top: size.height * 0.94 - 110,
       pipeWidth: 14.5,
       pipeHeight: 60,
-    );    
+    );
 
     // Joelho de conexão 3
     elbowPipePainter(
       canvas,
-      left: size.width/2,
+      left: size.width / 2,
       top: size.height * 0.94 - 35,
       giro: 1,
     );
-    // Tubo da conexão 3
+    // Tubo da conexão 3B
     pipePainter(
       canvas,
-      left: size.width/2+15,
+      left: size.width / 2 + 18,
       top: size.height * 0.94 + 3,
       pipeWidth: 300,
       pipeHeight: 14.5,
     );
+
+    // Adicionando a seta ao final do tubo da conexão 3B
+    drawArrow(
+      canvas,
+      startX: size.width / 2 + 318, // Posição final do tubo
+      startY: size.height * 0.94 + 3 + 7, // Ajuste para centralizar a seta
+      arrowLength: 50, // Tamanho da seta
+    );
+
     // Tubo da conexão 3
     pipePainter(
       canvas,
-      left: size.width/2-7,
+      left: size.width / 2 - 7,
       top: size.height * 0.94 - 110,
       pipeWidth: 14.5,
       pipeHeight: 100,
-    );       
+    );
     // Desenho do tank
     tankPaint(canvas, size);
     // Visor de nível
@@ -244,5 +253,29 @@ class TankPainter extends CustomPainter {
     // Tubo 1 (esquerda, mais perto da base)
     final pipe1 = Rect.fromLTWH(left, top, pipeWidth, pipeHeight);
     canvas.drawRect(pipe1, pipePaint);
+  }
+
+  // Função para desenhar a seta
+  void drawArrow(Canvas canvas,
+      {required double startX,
+      required double startY,
+      required double arrowLength}) {
+    final arrowPaint = Paint()
+      ..color = Colors.red // Cor da seta
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    // Desenho da linha da seta
+    final path = Path();
+    path.moveTo(startX, startY);
+    path.lineTo(startX + arrowLength, startY);
+
+    // Desenho das pontas da seta
+    path.moveTo(startX + arrowLength, startY);
+    path.lineTo(startX + arrowLength - 10, startY - 10);
+    path.moveTo(startX + arrowLength, startY);
+    path.lineTo(startX + arrowLength - 10, startY + 10);
+
+    canvas.drawPath(path, arrowPaint);
   }
 }
