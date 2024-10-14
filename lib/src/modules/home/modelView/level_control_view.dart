@@ -74,15 +74,16 @@ class _LevelControlViewState extends State<LevelControlView> {
                       _currentLevel, _widthValue / 2, _heightValue / 2),
                   _buildSlider(
                     controller.plantInputValue,
-                    _widthValue / 2 - _widthTanque * 0.6,
-                    150,
+                    "Ajuste da\nVazão da Bomba",
+                    _widthValue / 2 - _widthTanque * 0.7,
+                    130,
                   ),
                   _buildSlider(
-                      controller.tankLeakValue,
-                      _widthValue / 2 + _widthTanque * 0.55,
-                      _heightValue * 0.05,
-                      max: 0.5,
-                      min: 0.0000000001),
+                    controller.tankLeakValue,
+                    _widthValue / 2 + _widthTanque * 0.55,
+                    _heightValue * 0.05,
+                    min: 0.0000000001
+                  ),
                 ],
               );
             },
@@ -109,9 +110,8 @@ class _LevelControlViewState extends State<LevelControlView> {
     );
   }
 
-  Widget _buildSlider(final ValueNotifier<double> valueListenable,
-      final double _posLeft, final double bottom,
-      {final double min = 0, final double max = 10}) {
+  Widget _buildSlider(
+      ValueListenable<double> valueListenable, double _posLeft, double bottom, {final double min = 0,final double max = 10}) {
     return Positioned(
       bottom: bottom,
       left: _posLeft,
@@ -123,21 +123,29 @@ class _LevelControlViewState extends State<LevelControlView> {
               Text(
                 "${value.toStringAsFixed(2)}\n l/h",
                 style: TextStyle(
-                  fontFamily: 'Source Sans Pro', // Coloque o nome da fonte aqui
-                  fontSize: 16, // Altere o tamanho da fonte conforme necessário
+                  fontFamily: 'Source Sans Pro', // Fonte utilizada
+                  fontSize: 16, // Tamanho da fonte
                 ),
               ),
               RotatedBox(
-                quarterTurns: 3, // Rotaciona o slider para a posição vertical
+                quarterTurns: 3, // Mantém o slider na vertical
                 child: Align(
-                  alignment: Alignment
-                      .centerLeft, // Garante que ocupe a altura total possível
+                  alignment: Alignment.centerLeft,
                   child: Slider(
                     value: value,
                     min: min,
                     max: max,
                     onChanged: (newValue) => valueListenable.value = newValue,
                   ),
+                ),
+              ),
+              Text(
+                text, // Texto a ser exibido
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14, // Tamanho da fonte do texto
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
             ],

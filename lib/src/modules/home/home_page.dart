@@ -25,33 +25,45 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildTitle(),
-          const SizedBox(height: 10),
-          Expanded(
-            child: Row(children: [
-              Expanded(child: LevelControlView('percent_of_range')),
-              //const CustomTable(),
-            ]),
-          ),
-          //const SizedBox(height: 10),
-          //_buildLogContainer(),
-          const SizedBox(height: 10),
-          _buildControls(),
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 768 || constraints.maxHeight < 604) {
+            // Caso o tamanho da tela fique abaixo dos limites mínimos
+            return Center(
+              child: Text(
+                'A tela está muito pequena. Aumente o tamanho para continuar.',
+                style: TextStyle(fontSize: 18, color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
+
+          return Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildTitle(),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Row(children: [
+                    Expanded(child: LevelControlView('percent_of_range')),
+                  ]),
+                ),
+                const SizedBox(height: 10),
+                _buildControls(),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildTitle() {
     return Padding(
-      padding: const EdgeInsets.only(
-          top: 20), // Espaço interno
+      padding: const EdgeInsets.only(top: 20), // Espaço interno
       child: Container(
-      padding: const EdgeInsets.only(
-         left: 10, right: 10), // Espaço interno        
+        padding: const EdgeInsets.only(left: 10, right: 10), // Espaço interno
         decoration: BoxDecoration(
           color: Colors.blue, // Cor de fundo azul
           borderRadius: BorderRadius.circular(12), // Bordas arredondadas
