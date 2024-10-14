@@ -79,11 +79,12 @@ class _LevelControlViewState extends State<LevelControlView> {
                     130,
                   ),
                   _buildSlider(
-                    controller.tankLeakValue,
-                    _widthValue / 2 + _widthTanque * 0.55,
-                    _heightValue * 0.05,
-                    min: 0.0000000001
-                  ),
+                      controller.tankLeakValue,
+                      "Ajuste da\nVazão de saída",
+                      _widthValue / 2 + _widthTanque * 0.55,
+                      _heightValue * 0.05,
+                      max: 0.5,
+                      min: 0.0000000001),
                 ],
               );
             },
@@ -110,8 +111,9 @@ class _LevelControlViewState extends State<LevelControlView> {
     );
   }
 
-  Widget _buildSlider(
-      ValueListenable<double> valueListenable, double _posLeft, double bottom, {final double min = 0,final double max = 10}) {
+  Widget _buildSlider(final ValueNotifier<double> valueListenable,
+      final String text, final double _posLeft, final double bottom,
+      {final double min = 0, final double max = 10}) {
     return Positioned(
       bottom: bottom,
       left: _posLeft,
