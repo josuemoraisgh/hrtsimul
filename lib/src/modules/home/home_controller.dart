@@ -12,12 +12,13 @@ import '../../models/simul_transfer_function.dart';
 
 // Exemplo de função de transferência de 2ª ordem
 const List<double> numeratorTF = [1.0]; // Coeficientes do numerador
-const List<double> denominatorTF = [0.07, 0.0000000001]; // Coef. do Denom.
 const samplingTime = Duration(milliseconds: 100); // Tempo de amostragem
 
 class HomeController extends Disposable {
   late final HrtComm hrtComm;
   late final HrtTransmitter hrtTransmitter;
+
+  List<double> denominatorTF = [0.07, 0.0000000001]; // Coef. do Denom.
   final connectNotifier = ValueNotifier<String>("");
   final sendNotifier = ValueNotifier<String>("");
   final hrtFrameWrite = HrtFrame();
@@ -25,16 +26,26 @@ class HomeController extends Disposable {
   final commandController = TextEditingController();
   final frameType = ValueNotifier<String>("06");
   final selectedInstrument = ValueNotifier<String>(instrumentType[0]);
-
   // Criar a função de transferência
-  final tankTransfFunction =
-      TransferFunction(numeratorTF, denominatorTF, samplingTime);
+  late TransferFunction tankTransfFunction;
+
   final plantInputValue = ValueNotifier<double>(1.0);
   final plantOutputValue = ValueNotifier<double>(0.0);
   final tankLeakValue = ValueNotifier<double>(0.0000000001);
 
   HomeController(this.hrtComm) {
+    // Criar a função de transferência
+    tankTransfFunction =
+        TransferFunction(numeratorTF, denominatorTF, samplingTime);
     hrtTransmitter = HrtTransmitter(selectedInstrument, plantOutputValue);
+    tankLeakValue.addListener(() {
+      denominatorTF[1] = tankLeakValue.value;
+      tankTransfFunction.updatePlantParameters(
+        newNumerator: numeratorTF,
+        newDenominator: denominatorTF,
+        newSamplingTime: Duration(milliseconds: 200),
+      );
+    });
   }
 
   Future<void> hrtButtonConnect(String? e) async {

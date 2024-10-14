@@ -11,9 +11,9 @@ class TransferFunction extends Disposable {
   Stream? receiveStream;
   SendPort? _sendPort;
 
-  final List<double> numerator; // Coeficientes do numerador
-  final List<double> denominator; // Coeficientes do denominador
-  final Duration samplingTime; // Tempo de amostragem
+  List<double> numerator; // Coeficientes do numerador
+  List<double> denominator; // Coeficientes do denominador
+  Duration samplingTime; // Tempo de amostragem
 
   List<List<double>> discreteA = [];
   List<List<double>> discreteB = [];
@@ -26,6 +26,30 @@ class TransferFunction extends Disposable {
       : order = denominator.length - 1,
         state = List.filled(denominator.length - 1, 0.0) {
     _discretize();
+  }
+
+  // Função para atualizar os parâmetros da planta
+  void updatePlantParameters({
+    List<double>? newNumerator,
+    List<double>? newDenominator,
+    Duration? newSamplingTime,
+  }) {
+    stop();
+    numerator = newNumerator ?? numerator;
+    denominator = newDenominator ?? denominator;
+    samplingTime = newSamplingTime ?? samplingTime;
+    // Recalcula as matrizes de estado com os novos parâmetros
+    _discretize();
+    _sendPort?.send({
+      'mode': 'init',
+      'discreteA': discreteA,
+      'discreteB': discreteB,
+      'C': C,
+      'D': D,
+      'state': state,
+      'samplingTime': samplingTime.inMilliseconds,
+    });
+    start();
   }
 
   // Discretização usando a Transformada Bilinear (Tustin) para espaço de estado

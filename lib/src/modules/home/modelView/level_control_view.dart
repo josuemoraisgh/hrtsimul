@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import '../home_controller.dart';
@@ -79,11 +78,11 @@ class _LevelControlViewState extends State<LevelControlView> {
                     150,
                   ),
                   _buildSlider(
-                    controller.tankLeakValue,
-                    _widthValue / 2 + _widthTanque * 0.55,
-                    _heightValue * 0.05,
-                    min: 0.0000000001
-                  ),
+                      controller.tankLeakValue,
+                      _widthValue / 2 + _widthTanque * 0.55,
+                      _heightValue * 0.05,
+                      max: 0.5,
+                      min: 0.0000000001),
                 ],
               );
             },
@@ -110,8 +109,9 @@ class _LevelControlViewState extends State<LevelControlView> {
     );
   }
 
-  Widget _buildSlider(
-      ValueListenable<double> valueListenable, double _posLeft, double bottom, {final double min = 0,final double max = 10}) {
+  Widget _buildSlider(final ValueNotifier<double> valueListenable,
+      final double _posLeft, final double bottom,
+      {final double min = 0, final double max = 10}) {
     return Positioned(
       bottom: bottom,
       left: _posLeft,
@@ -136,8 +136,7 @@ class _LevelControlViewState extends State<LevelControlView> {
                     value: value,
                     min: min,
                     max: max,
-                    onChanged: (newValue) =>
-                        controller.plantInputValue.value = newValue,
+                    onChanged: (newValue) => valueListenable.value = newValue,
                   ),
                 ),
               ),
